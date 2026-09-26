@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>델파이 설문 선택</title>
+  <link rel="preconnect" href="https://script.google.com" crossorigin />
+  <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin />
+  <link rel="dns-prefetch" href="https://script.google.com" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', sans-serif;
+      background-color: #f0f0f0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: 100vh; padding: 40px 20px;
+    }
+
+    /* 상단 바 */
+    .top-bar {
+      width: 100%; max-width: 640px;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px; gap: 8px;
+    }
+    .top-email { font-size: 14px; color: #555; flex: 1; }
+    .btn-refresh {
+      font-size: 13px; padding: 6px 16px;
+      background: #fff; border: 1px solid #bbb; border-radius: 4px;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-refresh:hover { background: #e8e8e8; }
+    .btn-pw {
+      font-size: 13px; padding: 6px 16px;
+      background: #fff; border: 1px solid #bbb; border-radius: 4px;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-pw:hover { background: #e8e8e8; }
+    .btn-logout {
+      font-size: 13px; padding: 6px 16px;
+      background: #1e1e1e; border: none; border-radius: 4px;
+      color: #fff; cursor: pointer; transition: background .15s;
+    }
+    .btn-logout:hover { background: #333; }
+
+    /* P/W 변경 모달 */
+    .pw-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1100;align-items:center;justify-content:center}
+    .pw-overlay.active{display:flex}
+    .pw-modal{background:#fff;border-radius:6px;width:540px;max-width:96vw;max-height:90vh;position:relative;box-shadow:0 8px 32px rgba(0,0,0,.18);overflow:hidden}
+    .pw-modal-close{position:absolute;top:10px;right:14px;font-size:22px;color:#999;cursor:pointer;background:none;border:none;line-height:1;z-index:10;transition:color .15s}
+    .pw-modal-close:hover{color:#333}
+    .pw-modal iframe{width:100%;height:700px;border:none}
+
+    /* 카드 */
+    .card {
+      background: #fff; border-radius: 8px;
+      width: 100%; max-width: 640px;
+      padding: 40px 40px 36px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.10);
+    }
+    .card-title {
+      font-size: 18px; font-weight: bold; color: #111;
+      margin-bottom: 32px; text-align: center;
+    }
+
+    /* 설문 목록 */
+    .delphi-list { display: flex; flex-direction: column; gap: 16px; }
+
+    .delphi-item {
+      display: flex; align-items: center;
+      border: 1px solid #ddd; border-radius: 6px;
+      padding: 18px 22px; background: #fafafa;
+      transition: background .15s;
+    }
+    .delphi-item:hover { background: #f0f4ff; }
+
+    .delphi-label {
+      flex: 1; font-size: 16px; font-weight: bold; color: #222;
+    }
+      font-size: 12px; font-weight: 400; color: #888; margin-left: 6px;
+    }
+
+    /* 상태 텍스트 */
+    .status-text { font-size: 14px; font-weight: bold; margin-right: 16px; white-space: nowrap; }
+    .status-waiting    { color: #1a73e8; }
+    .status-proceeding { color: #27ae60; }
+    .status-done       { color: #555; }
+
+    /* 패널 개별 진행 상태 */
+    .panel-status {
+      font-size: 12px; font-weight: 600; margin-right: 14px;
+      padding: 4px 10px; border-radius: 4px; white-space: nowrap;
+    }
+    .ps-waiting    { background: #e8edf5; color: #4a6fa5; }
+    .ps-proceeding { background: #d4edda; color: #1a7a3c; }
+    .ps-done       { background: #333; color: #fff; }
+
+    /* 진입 버튼 */
+    .btn-enter {
+      padding: 8px 20px; font-size: 14px; font-weight: bold;
+      border-radius: 4px; cursor: pointer; white-space: nowrap;
+      transition: opacity .2s;
+    }
+    .btn-enter:hover { opacity: .85; }
+    .btn-enter.active-btn  { background: #1e1e1e; border: none; color: #fff; }
+    .btn-enter.edit-btn    { background: #4a6fa5; border: none; color: #fff; }
+    .btn-enter.done-btn    { background: #555; border: none; color: #ddd; cursor: default; }
+    .btn-enter.disabled-btn{ background: #eee; border: 1px solid #ccc; color: #aaa; cursor: default; }
+
+    /* 로딩 */
+    .loading { text-align: center; color: #aaa; font-size: 14px; padding: 40px 0; display:flex; flex-direction:column; align-items:center; gap:16px; }
+    .spinner { width:32px; height:32px; border:3px solid #e0e0e0; border-top:3px solid #4a6fa5; border-radius:50%; animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* 로그아웃 확인 모달 */
+    .overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.35); z-index: 1000;
+      align-items: center; justify-content: center;
+    }
+    .overlay.active { display: flex; }
+    .lo-modal {
+      background: #fff; border-radius: 6px;
+      padding: 36px 40px 28px; width: 320px; max-width: 92vw;
+      box-shadow: 0 8px 32px rgba(0,0,0,.18); text-align: center;
+    }
+    .lo-modal p { font-size: 15px; color: #333; line-height: 1.7; margin-bottom: 28px; }
+    .lo-actions { display: flex; gap: 10px; }
+    .lo-actions button {
+      flex: 1; padding: 11px 0; font-size: 14px; font-weight: bold;
+      border-radius: 4px; cursor: pointer; transition: opacity .2s;
+    }
+    .lo-actions button:hover { opacity: .85; }
+    .lo-cancel  { background: #fff; border: 1.5px solid #ccc; color: #333; }
+    .lo-confirm { background: #1e1e1e; border: none; color: #fff; }
+  </style>
+</head>
+<body>
+
+  <!-- 로그아웃 확인 모달 -->
+  <div class="overlay" id="loOverlay">
+    <div class="lo-modal">
+      <p>로그아웃 하시겠습니까?</p>
+      <div class="lo-actions">
+        <button class="lo-cancel"  id="loCancel">취소</button>
+        <button class="lo-confirm" id="loConfirm">로그아웃</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- P/W 변경 모달 -->
+  <div class="pw-overlay" id="pwOverlay">
+    <div class="pw-modal">
+      <button class="pw-modal-close" id="pwClose">&times;</button>
+      <iframe id="pwIframe" src=""></iframe>
+    </div>
+  </div>
+
+  <!-- 응답 수정 확인 모달 -->
+  <div class="overlay" id="editOverlay">
+    <div class="lo-modal" style="width:460px">
+      <p id="editMsg" style="white-space:nowrap"></p>
+      <div class="lo-actions">
+        <button class="lo-cancel"  id="editCancel">취소</button>
+        <button class="lo-confirm" id="editConfirm" style="background:#4a6fa5">응답 수정</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="top-bar">
+    <span class="top-email" id="topEmail"></span>
+    <button class="btn-refresh" id="btnRefresh">새로고침</button>
+    <button class="btn-pw" id="btnPw">P/W 변경</button>
+    <button class="btn-logout" id="btnLogout">로그아웃</button>
+  </div>
+
+  <div class="card">
+    <p class="card-title">델파이 설문 선택</p>
+    <div class="delphi-list" id="delphiList">
+      <div class="loading" id="loadingArea"><div class="spinner"></div><span>설문 정보를 불러오는 중...</span></div>
+    </div>
+  </div>
+
+<script>
+  /* ════════════════════════════════
+     설정
+  ════════════════════════════════ */
+  /* GAS 직접 호출 (CSV 캐싱 문제 해결 — 시트 업데이트 즉시 반영) */
+  const BASIC_GAS_URL = 'https://script.google.com/macros/s/AKfycbxo3RGK4848iyjphwZiKXgkmV1FoKb9Vxjil8TtiZf2zHTvRrkJBNQiH6TG5aCdUWmWSQ/exec';
+
+  const ROUND_INFO = [
+    { key: '1st_delphi', label: '1차 델파이 설문', page: '1st_delphi_intro.html', statusKey: '1st_delphi_status' },
+    { key: '2nd_delphi', label: '2차 델파이 설문', page: '2nd_delphi_intro.html',       statusKey: '2nd_delphi_status' },
+    { key: '3rd_delphi', label: '3차 델파이 설문', page: '3rd_delphi_intro.html',       statusKey: '3rd_delphi_status' },
+    { key: '4th_delphi', label: '4차 델파이 설문', page: '4th_delphi_intro.html',       statusKey: '4th_delphi_status' },
+    { key: '5th_delphi', label: '5차 델파이 설문(지표별 가중치 설정)', page: '5th_delphi_intro.html',       statusKey: '5th_delphi_status' },
+  ];
+
+  /* 세션 확인 */
+  const panelEmail = sessionStorage.getItem('panelEmail') || '';
+  if (!panelEmail) { location.href='index.html'; }
+  document.getElementById('topEmail').textContent = '👤 ' + panelEmail;
+
+  /* 설문 완료 후 돌아온 경우 감지 → 캐시 무시 플래그 */
+  const urlParams = new URLSearchParams(location.search);
+  let forceRefresh = urlParams.has('refresh');
+  if (forceRefresh) {
+    // URL에서 ?refresh 제거 (뒤로가기 시 반복 갱신 방지)
+    history.replaceState(null, '', location.pathname);
+    // 기존 캐시 즉시 삭제
+    sessionStorage.removeItem('select_delphi_cache');
+    sessionStorage.removeItem('select_delphi_cache_time');
+  }
+
+  /* 로그아웃 모달 */
+  const loOverlay = document.getElementById('loOverlay');
+  document.getElementById('btnLogout').addEventListener('click', ()=>loOverlay.classList.add('active'));
+  document.getElementById('loCancel').addEventListener('click',  ()=>loOverlay.classList.remove('active'));
+  document.getElementById('loConfirm').addEventListener('click', ()=>{ sessionStorage.clear(); location.href='end.html'; });
+  loOverlay.addEventListener('click', e=>{ if(e.target===loOverlay) loOverlay.classList.remove('active'); });
+
+  /* 응답 수정 확인 모달 */
+  const editOverlay = document.getElementById('editOverlay');
+  let pendingEditPage = '';
+  function confirmEdit(page, label) {
+    pendingEditPage = page;
+    document.getElementById('editMsg').textContent = label + ' 응답을 수정하시겠습니까?';
+    editOverlay.classList.add('active');
+  }
+  document.getElementById('editCancel').addEventListener('click', () => {
+    editOverlay.classList.remove('active');
+    pendingEditPage = '';
+  });
+  document.getElementById('editConfirm').addEventListener('click', () => {
+    editOverlay.classList.remove('active');
+    if (pendingEditPage) location.href = pendingEditPage;
+  });
+  editOverlay.addEventListener('click', e => {
+    if (e.target === editOverlay) { editOverlay.classList.remove('active'); pendingEditPage = ''; }
+  });
+
+  /* GAS 호출 헬퍼 */
+  async function gasCall(payload) {
+    const res = await fetch(BASIC_GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    });
+    const text = await res.text();
+    try { return JSON.parse(text); }
+    catch { return { status: 'error', message: '응답 파싱 실패: ' + text.substring(0, 200) }; }
+  }
+
+  /* 상태 → 색상 텍스트 */
+  function badgeHtml(check) {
+    const v = check || '대기';
+    let cls = 'status-waiting', label = '대기';
+    if (v === '진행중') { cls = 'status-proceeding'; label = '진행중'; }
+    if (v === '완료')   { cls = 'status-done';       label = '완료'; }
+    return `<span class="status-text ${cls}">${label}</span>`;
+  }
+
+  /* 패널 개별 상태 → 뱃지 */
+  function panelStatusHtml(val) {
+    const v = (val || '').trim();
+    if (!v || v === '대기') return '<span class="panel-status ps-waiting">대기</span>';
+    if (v === '진행중')     return '<span class="panel-status ps-proceeding">진행중</span>';
+    if (v.startsWith('완료')) return `<span class="panel-status ps-done">${v}</span>`;
+    return `<span class="panel-status ps-proceeding">${v}</span>`;
+  }
+
+  /* 버튼 활성화 여부: delphi_no 상태(check)와 패널 개별 상태(myStatus) 조합 */
+  function enterBtn(myStatus, check, page, label) {
+    const ms = (myStatus || '').trim();
+    const ck = (check || '').trim();
+
+    // 1) delphi_no가 "완료" → 설문 완료 (비활성)
+    if (ck === '완료') {
+      return `<button class="btn-enter done-btn" disabled>설문 완료</button>`;
+    }
+    // 2) delphi_no가 "진행중" + 패널이 "완료" → 응답 수정 (활성, 모달 확인)
+    if (ck === '진행중' && ms.startsWith('완료')) {
+      const safeLabel = label.replace(/'/g, "\\'");
+      return `<button class="btn-enter edit-btn" onclick="confirmEdit('${page}', '${safeLabel}')">응답 수정</button>`;
+    }
+    // 3) delphi_no가 "진행중" + 패널이 "진행중" → 설문 참여 (활성)
+    if (ck === '진행중' && ms === '진행중') {
+      return `<button class="btn-enter active-btn" onclick="location.href='${page}'">설문 참여</button>`;
+    }
+    // 4) 그 외 (대기 등) → 설문 참여 (비활성)
+    return `<button class="btn-enter disabled-btn" disabled>설문 참여</button>`;
+  }
+
+  /* 날짜 → 간단 형식 (2025.08.24.) */
+
+  /* 설문 목록 렌더링 — GAS 직접 호출 (CSV 캐싱 문제 완전 해결) */
+  async function loadDelphi() {
+    const list = document.getElementById('delphiList');
+    list.innerHTML = '<div class="loading"><div class="spinner"></div><span>설문 정보를 불러오는 중...</span></div>';
+
+    try {
+      /* sessionStorage 캐시 (3분) — forceRefresh 시 캐시 무시 */
+      const cacheKey = 'select_delphi_cache';
+      const cacheTimeKey = 'select_delphi_cache_time';
+      const cached = sessionStorage.getItem(cacheKey);
+      const cachedTime = parseInt(sessionStorage.getItem(cacheTimeKey) || '0', 10);
+      const CACHE_TTL = 3 * 60 * 1000;
+
+      let delphiData, panelRows, myPanel;
+
+      if (!forceRefresh && cached && (Date.now() - cachedTime < CACHE_TTL)) {
+        const c = JSON.parse(cached);
+        delphiData = c.delphiData;
+        myPanel = c.myPanel;
+      } else {
+        /* GAS 직접 호출 — 시트 데이터를 실시간으로 가져옴 (CSV 캐시 지연 없음) */
+        const [delphiResult, panelResult] = await Promise.all([
+          gasCall({ action: 'listDelphiNo' }),
+          gasCall({ action: 'listPanels' })
+        ]);
+
+        if (delphiResult.status !== 'ok') throw new Error(delphiResult.message || '델파이 상태 로드 실패');
+        if (panelResult.status !== 'ok')  throw new Error(panelResult.message || '패널 데이터 로드 실패');
+
+        delphiData = delphiResult.data;  // [{Delphi_no, check, save_date}]
+        panelRows  = panelResult.data;   // [{panel_no, 'e-mail', ...status keys..., etc}]
+
+        /* 현재 패널 찾기 */
+        myPanel = panelRows.find(r =>
+          (r['e-mail'] || '').trim().toLowerCase() === panelEmail.trim().toLowerCase()
+        ) || {};
+
+        /* 캐시 저장 */
+        sessionStorage.setItem(cacheKey, JSON.stringify({ delphiData, myPanel }));
+        sessionStorage.setItem(cacheTimeKey, String(Date.now()));
+        forceRefresh = false;  // 플래그 리셋
+      }
+
+      const map = {};
+      delphiData.forEach(r => { map[r['Delphi_no']] = r['check'] || '대기'; });
+
+      /* 패널 상태를 sessionStorage에 저장 (설문 페이지에서 GAS 재호출 없이 활용) */
+      sessionStorage.setItem('panelStatusData', JSON.stringify(myPanel));
+
+      list.innerHTML = ROUND_INFO.map(info => {
+        const check = map[info.key] || '대기';
+        const myStatus = myPanel[info.statusKey] || '대기';
+        return `
+          <div class="delphi-item">
+            <span class="delphi-label">${info.label}</span>
+            ${panelStatusHtml(myStatus)}
+            ${enterBtn(myStatus, check, info.page, info.label)}
+          </div>`;
+      }).join('');
+
+      /* ── 진행중인 설문 데이터를 백그라운드 프리페치 ── */
+      prefetchSurveyData(map, myPanel);
+    } catch(e) {
+      list.innerHTML = `<div class="loading"><span>로드 실패: ${e.message}</span></div>`;
+    }
+  }
+
+  /* ════════════════════════════════
+     설문 데이터 백그라운드 프리페치
+     — 사용자가 설문 페이지로 이동하기 전에 데이터를 미리 다운로드
+  ════════════════════════════════ */
+  const SURVEY_PREFETCH = {
+    '1st_delphi': {
+      gasUrl: 'https://script.google.com/macros/s/AKfycbx_2YnwVqMGOYnVIvEOxv1m_40JXpmWW3umPzirMaEzTfCo8Z6tcOZqkCw_WPOPObo/exec',
+      cacheKey: '1st_delphi_cache_v3',
+      cacheTimeKey: '1st_delphi_cache_v3_time',
+      statusKey: '1st_delphi_status'
+    }
+    // 2nd~5th 라운드 GAS URL이 확정되면 여기에 추가
+    // '2nd_delphi': { gasUrl: '...', cacheKey: '2nd_delphi_cache_v3', ... }
+  };
+
+  const PREFETCH_CACHE_TTL = 30 * 60 * 1000; // 30분
+
+  async function prefetchSurveyData(delphiMap, myPanel) {
+    const panelNo = sessionStorage.getItem('panelNo') || '';
+
+    for (const [key, config] of Object.entries(SURVEY_PREFETCH)) {
+      try {
+        const check = (delphiMap[key] || '').trim();
+        // 설문이 '진행중'인 경우만 프리페치
+        if (check !== '진행중') continue;
+
+        // 이미 유효한 캐시가 있으면 스킵
+        const cached = sessionStorage.getItem(config.cacheKey);
+        const cachedTime = parseInt(sessionStorage.getItem(config.cacheTimeKey) || '0', 10);
+        if (cached && (Date.now() - cachedTime < PREFETCH_CACHE_TTL)) {
+          console.log('[prefetch] ' + key + ' — 캐시 유효, 스킵');
+          continue;
+        }
+
+        console.log('[prefetch] ' + key + ' — 백그라운드 프리페치 시작...');
+        const [dataRes, addRes] = await Promise.all([
+          fetch(config.gasUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ action: 'getData' })
+          }).then(r => r.text()).then(t => { try { return JSON.parse(t); } catch { return { status:'error' }; } }),
+          fetch(config.gasUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ action: 'getAdditions', panel: panelNo || panelEmail })
+          }).then(r => r.text()).then(t => { try { return JSON.parse(t); } catch { return { status:'error' }; } })
+        ]);
+
+        if (dataRes && dataRes.status === 'ok' && Array.isArray(dataRes.rows) && dataRes.rows.length > 0) {
+          sessionStorage.setItem(config.cacheKey, JSON.stringify({ dataRes, addRes }));
+          sessionStorage.setItem(config.cacheTimeKey, String(Date.now()));
+          console.log('[prefetch] ' + key + ' — 프리페치 완료 (' + dataRes.rows.length + '건)');
+        }
+      } catch(e) {
+        console.log('[prefetch] ' + key + ' — 프리페치 실패 (무시):', e.message);
+      }
+    }
+  }
+
+  loadDelphi();
+
+  /* P/W 변경 모달 */
+  const pwOverlay = document.getElementById('pwOverlay');
+  const pwIframe  = document.getElementById('pwIframe');
+  document.getElementById('btnPw').addEventListener('click', () => {
+    pwIframe.src = 'pass_change.html?embed=1&_t=' + Date.now();
+    pwOverlay.classList.add('active');
+  });
+  document.getElementById('pwClose').addEventListener('click', () => {
+    pwOverlay.classList.remove('active'); pwIframe.src = '';
+  });
+  pwOverlay.addEventListener('click', e => {
+    if (e.target === pwOverlay) { pwOverlay.classList.remove('active'); pwIframe.src = ''; }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && pwOverlay.classList.contains('active')) {
+      pwOverlay.classList.remove('active'); pwIframe.src = '';
+    }
+  });
+  window.addEventListener('message', e => {
+    if (e.data && e.data.type === 'pwModalClose') {
+      pwOverlay.classList.remove('active'); pwIframe.src = '';
+    }
+  });
+
+  /* 새로고침 버튼 */
+  document.getElementById('btnRefresh').addEventListener('click', () => {
+    sessionStorage.removeItem('select_delphi_cache');
+    sessionStorage.removeItem('select_delphi_cache_time');
+    forceRefresh = true;
+    loadDelphi();
+  });
+</script>
+</body>
+</html>

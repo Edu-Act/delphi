@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2차 델파이 설문</title>
+  <link rel="preconnect" href="https://script.google.com" crossorigin />
+  <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin />
+  <link rel="dns-prefetch" href="https://script.google.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--ink:#1a1a2e;--ink-mid:#3d3d5c;--ink-soft:#6b6b8a;--accent:#4a6fa5;--accent-lt:#e8edf5;--divider:#d0d5e0;--bg:#f4f5f8;--card-bg:#fff}
+    body{font-family:'Noto Sans KR','Malgun Gothic',sans-serif;background:var(--bg);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 24px 60px}
+
+    /* ── 상단 헤더 ── */
+    .header-bar{width:100%;max-width:1246px;display:flex;align-items:center;gap:16px;margin-bottom:28px;flex-wrap:wrap}
+    .id-badge{background:#555;color:#fff;font-size:20px;font-weight:600;padding:6px 22px;border-radius:4px;white-space:nowrap}
+    .header-title{font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:var(--ink);line-height:1.4;white-space:nowrap}
+    .header-progress{font-size:16px;font-weight:600;color:var(--ink-soft);white-space:nowrap;flex:1;min-width:0}
+    .header-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+    .font-ctrl{display:flex;align-items:center;gap:0;background:#fff;border:1.5px solid var(--divider);border-radius:6px;overflow:hidden}
+    .btn-font{height:32px;padding:0 10px;font-weight:700;background:#fff;color:var(--ink-mid);border:none;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:2px;position:relative}
+    .btn-font:hover{background:var(--accent-lt);color:var(--accent)}
+    .btn-font:active{background:var(--accent);color:#fff}
+    .btn-font:disabled{opacity:.35;cursor:default;background:#fff;color:var(--ink-mid)}
+    .btn-font-letter{line-height:1}
+    .btn-font-down .btn-font-letter{font-size:12px}
+    .btn-font-up .btn-font-letter{font-size:17px}
+    .btn-font-icon{font-size:13px;font-weight:400;margin-top:-1px}
+    .font-scale-label{font-size:11px;font-weight:600;color:var(--ink-soft);min-width:36px;text-align:center;padding:0 2px;border-left:1px solid var(--divider);border-right:1px solid var(--divider);height:32px;display:flex;align-items:center;justify-content:center;background:#fafbfc;user-select:none}
+    .panel-label{font-size:14px;color:var(--ink-soft);white-space:nowrap}
+    .btn-hdr{padding:10px 22px;font-size:14px;font-weight:600;border:none;border-radius:4px;cursor:pointer;transition:background .2s;white-space:nowrap}
+    .btn-save{background:var(--accent);color:#fff}
+    .btn-save:hover{background:#3a5c8f}
+    .btn-save:disabled{opacity:.5;cursor:default}
+    .btn-end{background:#e8e8e8;color:var(--ink);border:1.5px solid var(--divider) !important}
+    .btn-end:hover{background:#d5d5d5}
+
+    /* ── 메인 ── */
+    .main-area{width:100%;max-width:1246px;display:flex;align-items:center;gap:0}
+    .nav-col{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:56px}
+    .nav-label{font-size:12px;color:var(--ink-soft);font-weight:500}
+    .nav-arrow{width:56px;min-width:56px;height:56px;display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--ink-soft);cursor:pointer;user-select:none;transition:color .2s,background .2s;border-radius:6px;background:transparent;border:none}
+    .nav-arrow:hover{color:var(--ink);background:rgba(0,0,0,.04)}
+    .nav-arrow:disabled{color:#ccc;cursor:default;background:transparent}
+    .cards-container{flex:1;display:flex;flex-direction:column;gap:20px;min-width:0}
+    .progress-bar-bottom{font-size:13px;color:var(--ink-soft);font-weight:500;text-align:center;padding:4px 2px 0}
+
+    /* ── 카드 ── */
+    .indicator-card{background:var(--card-bg);border:1px solid var(--divider);border-radius:6px;overflow:hidden}
+    .card-edu{border-top:3px solid #4a6fa5}
+    .card-edu .card-header{background:#e8edf5}
+    .card-hahwa{border-top:3px solid #5a9a6e}
+    .card-hahwa .card-header{background:#e9f5ec}
+    .card-sanggu{border-top:3px solid #8b6fb0}
+    .card-sanggu .card-header{background:#f0eaf7}
+    .card-header{display:flex;align-items:center;padding:9px 22px;background:var(--accent-lt);border-bottom:1px solid var(--divider);gap:12px;flex-wrap:wrap}
+    .card-header-title{font-size:17px;font-weight:600;color:var(--ink);white-space:nowrap;flex-shrink:0}
+    .card-header-element{font-size:15px;font-weight:600;color:var(--accent);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .btn-desc{font-size:12px;font-weight:600;border-radius:4px;padding:4px 14px;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
+    .card-edu .btn-desc{background:#fff;color:#4a6fa5;border:1.5px solid #4a6fa5}
+    .card-edu .btn-desc:hover{background:#4a6fa5;color:#fff}
+    .card-hahwa .btn-desc{background:#fff;color:#5a9a6e;border:1.5px solid #5a9a6e}
+    .card-hahwa .btn-desc:hover{background:#5a9a6e;color:#fff}
+    .card-sanggu .btn-desc{background:#fff;color:#8b6fb0;border:1.5px solid #8b6fb0}
+    .card-sanggu .btn-desc:hover{background:#8b6fb0;color:#fff}
+    .card-body{padding:20px 22px}
+
+    /* ── 지표 평정 항목 ── */
+    .index-item{padding:8px 0;border-bottom:1px solid #eee;display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap}
+    .index-item:first-child{padding-top:2px}
+    .index-item:last-child{border-bottom:none;padding-bottom:2px}
+    .index-left{flex:1;min-width:0}
+    .index-text{font-size:15px;color:var(--ink-mid);line-height:1.9;padding-left:var(--hang,2em);text-indent:calc(-1 * var(--hang,2em))}
+    .index-right{flex-shrink:0;display:flex;align-items:center;padding-top:4px}
+    .btn-add-reason{display:inline-block;margin-left:6px;padding:2px 8px;font-size:11px;font-family:inherit;background:#fffbf0;border:1px solid #c0a060;border-radius:4px;color:#8a6d30;cursor:pointer;font-weight:600;vertical-align:middle;line-height:1.4;transition:background .15s}
+    .btn-add-reason:hover{background:#fff3d8}
+    .rating-row{display:flex;align-items:center}
+    .rating-group{display:flex;align-items:center;gap:0}
+
+    /* ── 원형 평정 버튼 ── */
+    .rating-btn{position:relative;width:26px;height:26px;border-radius:50%;border:1.5px solid #7c8599;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s ease;font-family:inherit;padding:0;z-index:1}
+    .rating-btn .r-num{font-size:12px;font-weight:600;color:#5a6070;line-height:1;transition:color .18s}
+    .rating-btn .r-lbl{display:none}
+    .rating-btn:hover{border-color:var(--accent);background:#f6f8fc;transform:scale(1.15);box-shadow:0 1px 6px rgba(74,111,165,.18)}
+    .rating-btn:hover .r-num{color:var(--accent)}
+    .rating-btn.selected{background:var(--accent);border-color:var(--accent);box-shadow:0 1px 8px rgba(74,111,165,.25)}
+    .rating-btn.selected .r-num{color:#fff;font-weight:700}
+    .card-edu .rating-btn.selected{background:#4a6fa5;border-color:#4a6fa5;box-shadow:0 1px 8px rgba(74,111,165,.25)}
+    .card-hahwa .rating-btn.selected{background:#5a9a6e;border-color:#5a9a6e;box-shadow:0 1px 8px rgba(90,154,110,.25)}
+    .card-sanggu .rating-btn.selected{background:#8b6fb0;border-color:#8b6fb0;box-shadow:0 1px 8px rgba(139,111,176,.25)}
+    .card-edu .rating-btn:hover{border-color:#4a6fa5}
+    .card-edu .rating-btn:hover .r-num{color:#4a6fa5}
+    .card-hahwa .rating-btn:hover{border-color:#5a9a6e}
+    .card-hahwa .rating-btn:hover .r-num{color:#5a9a6e}
+    .card-sanggu .rating-btn:hover{border-color:#8b6fb0}
+    .card-sanggu .rating-btn:hover .r-num{color:#8b6fb0}
+    .card-edu .rating-btn.selected:hover .r-num,
+    .card-hahwa .rating-btn.selected:hover .r-num,
+    .card-sanggu .rating-btn.selected:hover .r-num{color:#fff}
+
+    /* 점선 연결선 */
+    .rating-dot-line{width:14px;height:0;border-top:1.5px dotted #c8cdd6;flex-shrink:0}
+
+    /* 툴팁 */
+    .rating-btn::after{content:attr(title);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);background:rgba(30,30,50,.88);color:#fff;font-size:10.5px;font-weight:500;letter-spacing:.02em;padding:3px 9px;border-radius:3px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:10}
+    .rating-btn::before{content:'';position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);border:3px solid transparent;border-top-color:rgba(30,30,50,.88);opacity:0;pointer-events:none;transition:opacity .15s;z-index:10}
+    .rating-btn:hover::after,.rating-btn:hover::before{opacity:1}
+
+    /* 사유 입력 (1,2 선택 시만 표시) — 카드 전체 폭 */
+    .reason-row{display:none;width:100%;margin-top:4px}
+    .reason-row.show{display:flex}
+    .reason-row{align-items:flex-start;gap:8px}
+    .reason-label{font-size:12px;color:var(--ink-soft);font-weight:500;white-space:nowrap;padding-top:7px;min-width:32px}
+    .reason-input{flex:1;border:1px solid var(--divider);border-radius:4px;padding:7px 12px;font-size:13px;font-family:inherit;line-height:1.5;outline:none;transition:border-color .2s;resize:vertical;min-height:36px}
+    .reason-input:focus{border-color:var(--accent)}
+    .reason-input::placeholder{color:#b8bcc6}
+
+    /* 임시저장 표시 */
+    .save-indicator{font-size:12px;color:#5a9a6e;font-weight:500;margin-left:8px;opacity:0;transition:opacity .3s}
+    .save-indicator.show{opacity:1}
+
+    /* ══ 지표 설명 드래그 모달 ══ */
+    .desc-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.18);z-index:1000}
+    .desc-overlay.active{display:block}
+    .desc-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:902px;max-width:96vw;height:80vh;background:#fff;border-radius:8px;box-shadow:0 12px 48px rgba(0,0,0,.22);z-index:1001;display:none;flex-direction:column;overflow:hidden}
+    .desc-modal.active{display:flex}
+    .desc-modal-header{display:flex;align-items:center;gap:12px;padding:16px 24px;background:var(--accent-lt);border-bottom:1px solid var(--divider);cursor:grab;user-select:none}
+    .desc-modal-header:active{cursor:grabbing}
+    .desc-modal-title{font-size:15px;font-weight:600;color:var(--ink);flex:1;min-width:0}
+    .desc-modal-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .desc-font-ctrl{display:flex;align-items:center;gap:0;background:#fff;border:1.5px solid var(--divider);border-radius:5px;overflow:hidden}
+    .desc-font-btn{width:30px;height:26px;font-size:15px;font-weight:700;background:#fff;color:var(--ink-mid);border:none;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+    .desc-font-btn:hover{background:var(--accent-lt);color:var(--accent)}
+    .desc-font-btn:active{background:var(--accent);color:#fff}
+    .desc-font-btn:disabled{opacity:.3;cursor:default;background:#fff;color:var(--ink-mid)}
+    .desc-font-label{font-size:10px;font-weight:600;color:var(--ink-soft);min-width:32px;text-align:center;border-left:1px solid var(--divider);border-right:1px solid var(--divider);height:26px;display:flex;align-items:center;justify-content:center;background:#fafbfc;user-select:none}
+    .desc-modal-close{padding:5px 16px;font-size:13px;font-weight:500;color:var(--ink-soft);background:#fff;border:1px solid var(--divider);border-radius:4px;cursor:pointer;transition:background .15s}
+    .desc-modal-close:hover{background:#eee}
+    .desc-modal-body{flex:1;padding:28px 32px;overflow-y:auto;font-size:14.5px;color:var(--ink-mid);line-height:2.0;word-break:keep-all;text-align:justify}
+    .desc-modal-body p{text-indent:1.5em;margin-bottom:12px}
+
+    /* ── 로딩 ── */
+    .loading-overlay{display:none;position:fixed;inset:0;background:var(--bg);z-index:2000;align-items:center;justify-content:center;flex-direction:column;gap:28px}
+    .loading-overlay.active{display:flex}
+    .loading-dots{display:flex;align-items:center;gap:10px}
+    .loading-dots span{width:14px;height:14px;border-radius:50%;background:var(--accent);animation:bounce .6s ease-in-out infinite alternate}
+    .loading-dots span:nth-child(1){animation-delay:0s;background:#4a6fa5}
+    .loading-dots span:nth-child(2){animation-delay:.15s;background:#5a9a6e}
+    .loading-dots span:nth-child(3){animation-delay:.3s;background:#8b6fb0}
+    .loading-dots span:nth-child(4){animation-delay:.45s;background:var(--accent)}
+    @keyframes bounce{0%{transform:translateY(0);opacity:.4}100%{transform:translateY(-18px);opacity:1}}
+    .loading-bar-wrap{width:200px;height:4px;background:#e0e3ea;border-radius:4px;overflow:hidden}
+    .loading-bar-inner{width:40%;height:100%;background:linear-gradient(90deg,#4a6fa5,#5a9a6e,#8b6fb0);border-radius:4px;animation:slide 1.4s ease-in-out infinite}
+    @keyframes slide{0%{transform:translateX(-100%)}50%{transform:translateX(150%)}100%{transform:translateX(-100%)}}
+    .loading-text{font-size:14px;color:var(--ink-soft);animation:pulse-text 1.6s ease-in-out infinite}
+    @keyframes pulse-text{0%,100%{opacity:.5}50%{opacity:1}}
+
+    /* ── 모달 공통 ── */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:1000;align-items:center;justify-content:center}
+    .modal-overlay.active{display:flex}
+    .modal-box{background:#fff;border-radius:6px;padding:32px 36px 28px;width:672px;max-width:94vw;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+    .modal-box h3{font-size:16px;color:var(--ink);margin-bottom:20px;font-weight:600}
+    .modal-actions{display:flex;gap:10px;margin-top:20px}
+    .modal-actions button{flex:1;padding:12px 0;font-size:14px;font-weight:600;border-radius:4px;cursor:pointer;transition:opacity .2s}
+    .modal-actions button:hover{opacity:.85}
+    .modal-cancel{background:#fff;border:1.5px solid #ccc;color:#333}
+    .modal-confirm{background:var(--accent);border:none;color:#fff}
+    .end-modal-box{text-align:center}
+    .end-modal-box p{font-size:15px;color:#333;line-height:1.7;margin-bottom:24px}
+
+    /* ── 완료 페이지 ── */
+    .completion-page{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;text-align:center;padding:60px 40px}
+    .completion-text{font-size:18px;color:var(--ink-mid);line-height:2.0;margin-bottom:36px;word-break:keep-all}
+    .btn-completion{padding:16px 48px;font-size:16px;font-weight:600;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;transition:background .2s;box-shadow:0 2px 12px rgba(74,111,165,.3)}
+    .btn-completion:hover{background:#3a5c8f}
+    .toast{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;transition:opacity .3s;z-index:3000;pointer-events:none}
+    .toast.show{opacity:1}
+
+    /* ── 설문 방법 확인 버튼 ── */
+    .btn-guide{background:#fff;color:var(--accent);border:1.5px solid var(--accent);font-weight:600}
+    .btn-guide:hover{background:var(--accent);color:#fff}
+
+    /* ── 가이드 모달 ── */
+    .guide-modal-box{width:960px;max-width:96vw;height:90vh;max-height:95vh;display:flex;flex-direction:column;overflow:hidden;padding:0;border-radius:8px}
+    .guide-modal-header{display:flex;align-items:center;padding:14px 22px;background:var(--accent-lt);border-bottom:1px solid var(--divider);cursor:grab;user-select:none;gap:12px}
+    .guide-modal-header:active{cursor:grabbing}
+    .guide-modal-title{font-size:16px;font-weight:600;color:var(--ink);flex:1}
+    .guide-modal-close{padding:5px 16px;font-size:13px;font-weight:500;color:var(--ink-soft);background:#fff;border:1px solid var(--divider);border-radius:4px;cursor:pointer;transition:background .15s}
+    .guide-modal-close:hover{background:#eee}
+    .guide-iframe{flex:1;width:100%;border:none;min-height:400px}
+
+    /* ── 자동저장 진행바 (#6) ── */
+    .autosave-progress{position:fixed;top:0;left:0;width:100%;height:3px;z-index:3001;pointer-events:none;opacity:0;transition:opacity .2s}
+    .autosave-progress.active{opacity:1}
+    .autosave-progress-bar{height:100%;width:0;background:linear-gradient(90deg,#4a6fa5,#5a9a6e,#8b6fb0);border-radius:0 2px 2px 0;transition:width .3s ease}
+
+    @media(max-width:768px){
+      .header-title{font-size:18px}
+      .nav-arrow{width:36px;min-width:36px;font-size:22px}
+      .header-bar{gap:10px}
+      .index-item{flex-direction:column;gap:8px}
+      .index-right{align-items:flex-start;width:100%}
+      .rating-btn{min-width:48px;padding:6px 8px}
+      .rating-btn .r-lbl{font-size:9px}
+      .reason-input{width:100%}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-dots"><span></span><span></span><span></span><span></span></div>
+    <div class="loading-bar-wrap"><div class="loading-bar-inner"></div></div>
+    <span class="loading-text">설문 데이터를 불러오는 중...</span>
+  </div>
+
+  <!-- 자동저장 진행바 (#6) -->
+  <div class="autosave-progress" id="autosaveProgress">
+    <div class="autosave-progress-bar" id="autosaveProgressBar"></div>
+  </div>
+
+  <!-- 데이터 로드 실패 모달 -->
+  <div class="modal-overlay" id="retryModal">
+    <div class="modal-box end-modal-box" id="retryModalBox">
+      <p id="retryMsg" style="cursor:grab;user-select:none">설문 데이터를 불러오지 못했습니다.</p>
+      <div class="modal-actions">
+        <button class="modal-confirm" id="retryBtn">다시 시도</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 지표 설명 드래그 모달 -->
+  <div class="desc-overlay" id="descOverlay"></div>
+  <div class="desc-modal" id="descModal">
+    <div class="desc-modal-header" id="descModalHeader">
+      <span class="desc-modal-title" id="descModalTitle">요소 설명</span>
+      <div class="desc-modal-right">
+        <div class="desc-font-ctrl">
+          <button class="desc-font-btn" id="descFontDown" title="글자 축소">−</button>
+          <span class="desc-font-label" id="descFontLabel">100%</span>
+          <button class="desc-font-btn" id="descFontUp" title="글자 확대">+</button>
+        </div>
+        <button class="desc-modal-close" id="descModalClose">닫기</button>
+      </div>
+    </div>
+    <div class="desc-modal-body" id="descModalBody"></div>
+  </div>
+
+  <!-- 미평정 확인 모달 -->
+  <div class="modal-overlay" id="unratedNavModal">
+    <div class="modal-box end-modal-box" id="unratedNavModalBox">
+      <p id="unratedNavMsg" style="cursor:grab;user-select:none">평정되지 않은 지표가 있습니다.<br>그래도 이동하시겠습니까?</p>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="unratedNavCancel">취소</button>
+        <button class="modal-confirm" id="unratedNavConfirm">이동</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 설문 종료 확인 모달 -->
+  <div class="modal-overlay" id="endModal">
+    <div class="modal-box end-modal-box" id="endModalBox">
+      <p id="endModalMsg" style="cursor:grab;user-select:none">전체 설문이 아직 완료되지 않았습니다.<br>완료되지 않은 설문은 이후에 다시 가능합니다.<br>설문을 종료하시겠습니까?</p>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="endModalCancel">취소</button>
+        <button class="modal-confirm" id="endModalConfirm">종료</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 저장 확인 모달 -->
+  <div class="modal-overlay" id="saveConfirmModal">
+    <div class="modal-box end-modal-box" id="saveConfirmBox">
+      <p id="saveConfirmMsg" style="cursor:grab;user-select:none">현재 페이지의 평정을 저장하시겠습니까?</p>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="saveConfirmCancel">취소</button>
+        <button class="modal-confirm" id="saveConfirmOk">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 제출 확인 모달 (#3) -->
+  <div class="modal-overlay" id="submitConfirmModal">
+    <div class="modal-box end-modal-box" id="submitConfirmBox">
+      <p id="submitConfirmMsg" style="cursor:grab;user-select:none">설문 응답 내용을 제출하시겠습니까?</p>
+      <div class="modal-actions">
+        <button class="modal-cancel" id="submitConfirmCancel">취소</button>
+        <button class="modal-confirm" id="submitConfirmOk">제출</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 설문 완료 안내 모달 -->
+  <div class="modal-overlay" id="doneModal">
+    <div class="modal-box end-modal-box" id="doneModalBox">
+      <p id="doneModalMsg" style="cursor:grab;user-select:none">2차 델파이 설문이 완료되었습니다.<br>감사합니다.</p>
+      <div class="modal-actions">
+        <button class="modal-confirm" id="doneModalOk" style="flex:none;width:140px;margin:0 auto">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 안내 메시지 모달 -->
+  <div class="modal-overlay" id="infoModal">
+    <div class="modal-box end-modal-box" id="infoModalBox">
+      <p id="infoModalMsg" style="cursor:grab;user-select:none"></p>
+      <div class="modal-actions">
+        <button class="modal-confirm" id="infoModalOk" style="flex:none;width:140px;margin:0 auto">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 추가 사유 확인 모달 -->
+  <div class="modal-overlay" id="addReasonModal">
+    <div class="modal-box" id="addReasonModalBox" style="width:600px;max-height:80vh;display:flex;flex-direction:column">
+      <h3 id="addReasonModalTitle" style="flex-shrink:0">추가 사유</h3>
+      <div id="addReasonModalBody" style="overflow-y:auto;flex:1;font-size:14px;color:var(--ink-mid);line-height:1.9;word-break:keep-all"></div>
+      <div class="modal-actions" style="flex-shrink:0;justify-content:center">
+        <button class="modal-cancel" id="addReasonModalClose" style="flex:none;width:140px">닫기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 설문 방법 확인 모달 -->
+  <div class="modal-overlay" id="guideModal">
+    <div class="modal-box guide-modal-box" id="guideModalBox">
+      <div class="guide-modal-header" id="guideModalHeader">
+        <span class="guide-modal-title">설문 방법 확인</span>
+        <button class="guide-modal-close" id="guideModalClose">닫기</button>
+      </div>
+      <iframe class="guide-iframe" id="guideIframe" src="about:blank"></iframe>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- 상단 헤더 -->
+  <div class="header-bar" id="surveyHeader" style="display:none">
+    <div class="id-badge" id="idBadge">ID</div>
+    <div class="header-title" id="headerTitle">불러오는 중...</div>
+
+    <div class="header-right">
+      <span class="panel-label" id="panelLabel">패널 : </span>
+      <div class="font-ctrl">
+        <button class="btn-font btn-font-down" id="btnFontDown" title="글자 축소"><span class="btn-font-icon">−</span><span class="btn-font-letter">A</span></button>
+        <span class="font-scale-label" id="fontScaleLabel">100%</span>
+        <button class="btn-font btn-font-up" id="btnFontUp" title="글자 확대"><span class="btn-font-letter">A</span><span class="btn-font-icon">+</span></button>
+      </div>
+      <button class="btn-hdr btn-guide" id="btnGuide">설문 방법 확인</button>
+      <button class="btn-hdr btn-save" id="btnSave">저장</button>
+      <button class="btn-hdr btn-end" id="btnEnd">나가기</button>
+    </div>
+  </div>
+
+  <!-- 메인 -->
+  <div class="main-area" id="surveyMain" style="display:none">
+    <div class="nav-col" id="navPrevCol">
+      <button class="nav-arrow" id="btnPrev" title="이전">&#10094;</button>
+      <span class="nav-label">이전</span>
+    </div>
+    <div class="cards-container">
+      <!-- 교육활동 -->
+      <div class="indicator-card card-edu" id="cardEdu">
+        <div class="card-header">
+          <span class="card-header-title">교육활동 평정 지표</span>
+          <span class="card-header-element" id="labelEduElement"></span>
+          <button class="btn-desc" id="btnDescEdu">☞ &nbsp;요소 설명 보기</button>
+        </div>
+        <div class="card-body" id="bodyEdu"></div>
+      </div>
+      <!-- 하화활동 -->
+      <div class="indicator-card card-hahwa" id="cardHahwa">
+        <div class="card-header">
+          <span class="card-header-title">하화활동 평정 지표</span>
+          <span class="card-header-element" id="labelHahwaElement"></span>
+          <button class="btn-desc" id="btnDescHahwa">☞ &nbsp;요소 설명 보기</button>
+        </div>
+        <div class="card-body" id="bodyHahwa"></div>
+      </div>
+      <!-- 상구활동 -->
+      <div class="indicator-card card-sanggu" id="cardSanggu">
+        <div class="card-header">
+          <span class="card-header-title">상구활동 평정 지표</span>
+          <span class="card-header-element" id="labelSangguElement"></span>
+          <button class="btn-desc" id="btnDescSanggu">☞ &nbsp;요소 설명 보기</button>
+        </div>
+        <div class="card-body" id="bodySanggu"></div>
+      </div>
+      <!-- 진행 상태 -->
+      <div class="progress-bar-bottom" id="progressBottom"></div>
+      <!-- 설문 완료 페이지 -->
+      <div class="completion-page" id="completionPage" style="display:none">
+        <p class="completion-text">교육활동 지표 적절성에 대한 2차 델파이 설문의 마지막 페이지입니다.</p>
+        <p class="completion-text" id="completionQuestion" style="margin-top:0">설문을 완료하시겠습니까?</p>
+        <button class="btn-completion" id="btnComplete">설문 완료</button>
+      </div>
+    </div>
+    <div class="nav-col" id="navNextCol">
+      <button class="nav-arrow" id="btnNext" title="다음">&#10095;</button>
+      <span class="nav-label">다음</span>
+    </div>
+  </div>
+
+<script>
+  /* ════════════════════ 설정 ════════════════════ */
+  // ※ GAS_URL: 평정 결과를 시트에 기록하는 Google Apps Script 웹앱 주소
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbysXI5mioZlwDqCxAwFlWt2Q38juTSvVgMd3iDNsUE1wpgofacS0TdGV6hdPYhJoe7p/exec';
+  const BASIC_GAS_URL = 'https://script.google.com/macros/s/AKfycbxo3RGK4848iyjphwZiKXgkmV1FoKb9Vxjil8TtiZf2zHTvRrkJBNQiH6TG5aCdUWmWSQ/exec';
+
+  const SHEET_ID = '1NNGVW2uSdsMVZhuWJM4HhUWv4-PDIGR0S6EWoGund74';
+  /* CSV URL은 폴백용으로 보관 */
+  const CSV_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQfsutGZh1Xm6BuYN8umJ5gukyRLGG-jK52QoBfvxeRwbEntR1q_P9_HUBLSIDQruLdYETVYpADLlMy/pub';
+
+  const RATING_LABELS = ['매우\n부적절','부적절','적절','매우\n적절'];
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const isPreview = urlParams.get('preview') === '1';
+  const previewPanel = urlParams.get('panel') || 'panel_01';
+  const previewIndex = parseInt(urlParams.get('panelIndex') || '1', 10);
+
+  const panelEmail = sessionStorage.getItem('panelEmail') || (isPreview ? 'admin_preview' : '');
+  if (!panelEmail) location.href = 'index.html';
+  document.getElementById('panelLabel').textContent = isPreview ? '패널 : 관리자 미리보기' : '패널 : ' + panelEmail;
+
+  /* 패널 번호: GAS에서 Basic_Data 조회하여 설정 */
+  let panelColValue = '';  // 'panel_01' ~ 'panel_15'
+
+  function getPanelCol() {
+    return panelColValue;
+  }
+
+  /* (#4) 재제출 여부 플래그 */
+  let isResubmit = false;
+
+  let idRows      = [];   // id 탭 데이터
+  let eduIndices   = {};   // { ID: [ {index, row#, ...} ] }
+  let hahwaIndices = {};
+  let sangguIndices= {};
+  let addReasonData = []; // 1차 추가 의견 데이터
+  let currentIndex  = 0;
+
+  // 평정 상태를 메모리에 보관 (pageId-type-indexRow → {rating, reason})
+  let responses = {};
+
+  /* (#2, #5) Dirty tracking — 수정된 페이지만 자동 저장 */
+  const dirtyPages = new Set();
+
+  /* ── 유틸 ── */
+  function showToast(m, d=2000) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),d); }
+  function showLoading(v) { document.getElementById('loadingOverlay').classList.toggle('active',v); }
+
+  /* 설문 화면 표시/숨김 */
+  function showSurveyUI(v) {
+    document.getElementById('surveyHeader').style.display = v ? '' : 'none';
+    document.getElementById('surveyMain').style.display = v ? '' : 'none';
+  }
+  function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+  /* (#6) 자동저장 진행바 */
+  function showAutosaveProgress(show) {
+    const wrap = document.getElementById('autosaveProgress');
+    const bar = document.getElementById('autosaveProgressBar');
+    if (show) {
+      bar.style.transition = 'none';
+      bar.style.width = '0%';
+      wrap.classList.add('active');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          bar.style.transition = 'width 1.5s ease';
+          bar.style.width = '85%';
+        });
+      });
+    } else {
+      bar.style.transition = 'width .2s ease';
+      bar.style.width = '100%';
+      setTimeout(() => {
+        wrap.classList.remove('active');
+        bar.style.width = '0%';
+      }, 300);
+    }
+  }
+
+  /* ════════════════════ CSV 파싱 ════════════════════ */
+  function parseCSV(text) {
+    const rows = [];
+    let cur = '', inQ = false, row = [];
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQ) {
+        if (c === '"' && text[i+1] === '"') { cur += '"'; i++; }
+        else if (c === '"') inQ = false;
+        else cur += c;
+      } else {
+        if (c === '"') inQ = true;
+        else if (c === ',') { row.push(cur); cur = ''; }
+        else if (c === '\n' || (c === '\r' && text[i+1] === '\n')) {
+          row.push(cur); cur = ''; rows.push(row); row = [];
+          if (c === '\r') i++;
+        } else if (c === '\r') {
+          row.push(cur); cur = ''; rows.push(row); row = [];
+        } else cur += c;
+      }
+    }
+    if (cur || row.length) { row.push(cur); rows.push(row); }
+    return rows;
+  }
+
+  function csvToObjects(text, headerRowIdx) {
+    const raw = parseCSV(text);
+    if (raw.length <= headerRowIdx) return [];
+    // 헤더: 지정 행 사용 (0-based index)
+    const hdr = raw[headerRowIdx].map(h => h.trim());
+    const out = [];
+    for (let i = headerRowIdx + 1; i < raw.length; i++) {
+      const obj = {};
+      hdr.forEach((h, j) => { obj[h] = (raw[i][j] || '').trim(); });
+      if (obj[hdr[0]]) out.push(obj);  // ID 비어있으면 스킵
+    }
+    return out;
+  }
+
+  /* id 탭: 헤더가 row 1 (0-based 0) */
+  function parseIdTab(text) {
+    return csvToObjects(text, 0);
+  }
+
+  /* index 탭: gviz/tq는 병합 헤더를 별도 행으로 반환할 수 있음
+     → "I-ID" 또는 "ID" 컬럼이 있는 행을 헤더로 자동 감지 */
+  function parseIndexTab(text) {
+    const raw = parseCSV(text);
+    if (raw.length === 0) return [];
+    // "I-ID" 또는 "ID"가 포함된 첫 번째 행을 헤더로 사용
+    let headerIdx = 0;
+    for (let i = 0; i < Math.min(raw.length, 5); i++) {
+      const row = raw[i].map(c => c.trim());
+      if (row.includes('I-ID') && row.includes('E-ID')) { headerIdx = i; break; }
+      if (row.includes('I-ID')) { headerIdx = i; break; }
+      if (row.includes('ID')) { headerIdx = i; break; }
+    }
+    const hdr = raw[headerIdx].map(h => h.trim());
+    // 중복 헤더 처리
+    const seen = {};
+    const uniqueHdr = hdr.map(h => {
+      if (!seen[h]) { seen[h] = 1; return h; }
+      seen[h]++;
+      return h + '_' + (seen[h] - 1);
+    });
+    const out = [];
+    for (let i = headerIdx + 1; i < raw.length; i++) {
+      const obj = {};
+      uniqueHdr.forEach((h, j) => { obj[h] = (raw[i][j] || '').trim(); });
+      // I-ID 기반이면 index 필드 매핑 (C열의 탭별 컬럼명을 'index'로 통일)
+      if (obj['I-ID']) {
+        // C열 값을 index로도 접근 가능하게
+        const indexColName = uniqueHdr[2]; // C열 헤더 (edu-act_index 등)
+        if (indexColName && indexColName !== 'index') {
+          obj.index = obj[indexColName] || '';
+        }
+      }
+      if (obj[uniqueHdr[0]]) out.push(obj);
+    }
+    return out;
+  }
+
+  /* index 배열을 E-ID별로 그룹핑 */
+  function groupById(arr) {
+    const map = {};
+    arr.forEach((row, i) => {
+      const eId = row['E-ID'] || row.ID || '';
+      if (!eId) return;
+      if (!map[eId]) map[eId] = [];
+      row._csvRow = i;
+      map[eId].push(row);
+    });
+    return map;
+  }
+
+  /* ════════════════════ 데이터 로드 ════════════════════ */
+  const retryModal = document.getElementById('retryModal');
+  const retryMsg   = document.getElementById('retryMsg');
+  document.getElementById('retryBtn').addEventListener('click', () => {
+    retryModal.classList.remove('active');
+    loadData();
+  });
+
+  async function fetchCSV(url) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return await res.text();
+  }
+
+  /* (#1) 타임아웃 포함 fetch 래퍼 — GAS cold start 대응 */
+  function fetchWithTimeout(url, options, timeoutMs = 30000) {
+    return Promise.race([
+      fetch(url, options),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('요청 시간 초과 (서버 응답 없음)')), timeoutMs))
+    ]);
+  }
+
+  async function loadData() {
+    showLoading(true);
+    try {
+      /* (#1) 캐시 키 갱신 — 기존 캐시와 충돌 방지 */
+      const cacheKey = '2nd_delphi_cache_v2_' + panelEmail;
+      const cacheTimeKey = '2nd_delphi_cache_time_v2_' + panelEmail;
+      const cached = sessionStorage.getItem(cacheKey);
+      const cachedTime = parseInt(sessionStorage.getItem(cacheTimeKey) || '0', 10);
+      const CACHE_TTL = 5 * 60 * 1000;
+
+      let panelCol = '';
+      let panelIdx = 0;
+      let surveyData, savedRatingsData;
+
+      if (cached && (Date.now() - cachedTime < CACHE_TTL)) {
+        /* ── 캐시 히트: 새 포맷(E-ID) 여부 검증 후 사용 ── */
+        const c = JSON.parse(cached);
+        const firstEdu = (c.surveyData && c.surveyData.eduRows && c.surveyData.eduRows[0]) || {};
+        const hasNewFormat = !!firstEdu['E-ID'];
+
+        if (hasNewFormat || !(c.surveyData && c.surveyData.eduRows && c.surveyData.eduRows.length)) {
+          panelCol = c.panelCol || '';
+          panelIdx = c.panelIdx || 0;
+          surveyData = c.surveyData;
+          savedRatingsData = c.savedRatingsData;
+          console.log('[loadData] 캐시에서 로드 (새 포맷)');
+        } else {
+          // 기존 포맷 캐시 → 무효화하고 서버에서 다시 로드
+          console.log('[loadData] 캐시가 기존 포맷 → 무효화');
+          sessionStorage.removeItem(cacheKey);
+          sessionStorage.removeItem(cacheTimeKey);
+          surveyData = null; // 아래 서버 호출로 이동
+        }
+      }
+
+      if (!surveyData) {
+        /* ── 서버에서 로드 (캐시 미스 또는 기존 포맷 무효화) ── */
+        // (#1) 재시도 로직 포함
+        const MAX_RETRIES = 2;
+
+        // 1) 패널 조회 — 미리보기 모드에서는 URL 파라미터 사용
+        let panelP;
+        if (isPreview) {
+          panelP = Promise.resolve({ status:'ok', panelCol: previewPanel, panelIndex: previewIndex });
+        } else {
+          panelP = fetchWithTimeout(BASIC_GAS_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ action: 'getPanelByEmail', email: panelEmail })
+          }, 30000).then(r => r.text()).then(t => { try{return JSON.parse(t)}catch{return{status:'error'}} })
+            .catch(() => ({ status:'error' }));
+        }
+
+        // 2) 설문 데이터 (GAS - getAllData) — 재시도 포함
+        let dataResult = null;
+        for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+          try {
+            const dataRes = await fetchWithTimeout(GAS_URL + '?action=getAllData', {}, 30000);
+            const dataText = await dataRes.text();
+            dataResult = JSON.parse(dataText);
+            if (dataResult && dataResult.status === 'ok') break;
+          } catch(e) {
+            console.warn('[loadData] 데이터 로드 시도 ' + (attempt+1) + ' 실패:', e.message);
+            if (attempt === MAX_RETRIES) throw new Error('설문 데이터 로드 실패: ' + e.message);
+            // 재시도 전 짧은 대기
+            await new Promise(r => setTimeout(r, 1500));
+          }
+        }
+
+        // 패널 결과 대기
+        const panelResult = await panelP;
+
+        if (panelResult.status === 'ok' && panelResult.panelCol) {
+          panelCol = panelResult.panelCol;
+          panelIdx = panelResult.panelIndex || 0;
+        }
+        surveyData = dataResult;
+
+        // 3) 저장값 조회 (패널 확인 후)
+        savedRatingsData = { savedRatings: {} };
+        if (panelCol && panelIdx > 0) {
+          try {
+            const srUrl = GAS_URL + '?action=getSavedRatings&panelCol=' + encodeURIComponent(panelCol) + '&panelIndex=' + panelIdx;
+            const srRes = await fetchWithTimeout(srUrl, {}, 25000);
+            const srText = await srRes.text();
+            savedRatingsData = JSON.parse(srText);
+          } catch(e) { console.warn('[loadData] savedRatings 조회 실패:', e); }
+        }
+
+        // 캐시 저장
+        sessionStorage.setItem(cacheKey, JSON.stringify({ panelCol, panelIdx, surveyData, savedRatingsData }));
+        sessionStorage.setItem(cacheTimeKey, String(Date.now()));
+      }
+
+      if (surveyData.status !== 'ok') throw new Error(surveyData.message || '데이터 로드 실패');
+
+      /* 패널 번호 설정 */
+      panelColValue = panelCol || '';
+
+      /* id 탭 */
+      idRows = surveyData.idRows || [];
+
+      /* index 탭들 */
+      eduIndices    = groupByIdFromGAS(surveyData.eduRows || []);
+      hahwaIndices  = groupByIdFromGAS(surveyData.hahwaRows || []);
+      sangguIndices = groupByIdFromGAS(surveyData.sangguRows || []);
+
+      // 1차 추가 의견 데이터 로드 (추가 사유 확인용)
+      try {
+        const addRes = await gasCall({ action:'get1stAddData' });
+        if (addRes.status === 'ok' && addRes.rows) {
+          addReasonData = addRes.rows;
+          console.log('[init] 1차 추가 의견:', addReasonData.length, '건');
+        }
+      } catch(ae) { console.warn('[init] 추가 의견 로드 실패:', ae); }
+
+      console.log('[init] id:', idRows.length, 'edu:', (surveyData.eduRows||[]).length, 'hahwa:', (surveyData.hahwaRows||[]).length, 'sanggu:', (surveyData.sangguRows||[]).length);
+      console.log('[init] eduIndices keys:', Object.keys(eduIndices));
+      console.log('[init] hahwaIndices keys:', Object.keys(hahwaIndices));
+      console.log('[init] sangguIndices keys:', Object.keys(sangguIndices));
+      if (idRows.length > 0) console.log('[init] first idRow:', JSON.stringify(idRows[0]));
+      if ((surveyData.eduRows||[]).length > 0) console.log('[init] first eduRow:', JSON.stringify(surveyData.eduRows[0]));
+
+      /* 기존 응답 복원 */
+      if (savedRatingsData && savedRatingsData.savedRatings) {
+        restoreSavedFromInit(savedRatingsData.savedRatings);
+      }
+
+      if (idRows.length === 0) {
+        retryMsg.textContent = '설문 데이터가 없습니다. 시트를 확인해주세요.';
+        retryModal.classList.add('active');
+      } else {
+        /* (#4) 완료 상태 확인 — 재제출 여부 판별 */
+        await checkPanelCompletionStatus();
+        renderPage();
+        showSurveyUI(true);
+      }
+    } catch(e) {
+      console.error('[loadData 에러]', e);
+      retryMsg.textContent = '데이터 로드 실패: ' + e.message;
+      retryModal.classList.add('active');
+      showSurveyUI(false);
+    }
+    finally { showLoading(false); }
+  }
+
+  /* (#4) Basic_Data에서 2차 설문 완료 상태 확인 */
+  async function checkPanelCompletionStatus() {
+    if (isPreview) return;
+    try {
+      const res = await fetchWithTimeout(BASIC_GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'getPanelByEmail', email: panelEmail })
+      }, 15000);
+      const text = await res.text();
+      const data = JSON.parse(text);
+      if (data.status === 'ok' && data.panelInfo) {
+        const status = data.panelInfo['2nd_delphi_status'] || '';
+        if (status === 'completed' || status === '완료') {
+          isResubmit = true;
+          console.log('[checkCompletion] 2차 설문 이미 완료 → 재제출 모드');
+        }
+      }
+    } catch(e) {
+      console.warn('[checkCompletion] 상태 확인 실패:', e);
+    }
+  }
+
+  /* init 응답에서 기존 응답 복원 */
+  function restoreSavedFromInit(savedRatings) {
+    const sheetTypeMap = { 'edu-act_index':'edu', 'hahwa-act_index':'hahwa', 'sanggu-act_index':'sanggu' };
+    let totalRestored = 0;
+
+    Object.keys(savedRatings).forEach(sheetKey => {
+      const type = sheetTypeMap[sheetKey];
+      if (!type) return;
+      const entries = savedRatings[sheetKey];
+      console.log('[restore]', sheetKey, '→ 저장된 항목:', entries.length);
+
+      entries.forEach(entry => {
+        // entry.id = E-ID (페이지 매칭용), entry.iId = I-ID (개별 지표 ID)
+        const pageIdx = idRows.findIndex(r => (r['E-ID'] || r.ID) === entry.id);
+        if (pageIdx < 0) { console.log('[restore] E-ID 못찾음:', entry.id); return; }
+
+        const map = type === 'edu' ? eduIndices : type === 'hahwa' ? hahwaIndices : sangguIndices;
+        const list = map[entry.id] || [];
+
+        // 1차: I-ID로 정확 매칭
+        let iIdx = entry.iId ? list.findIndex(item => item['I-ID'] === entry.iId) : -1;
+
+        // 2차: _rowNum으로 매칭
+        if (iIdx < 0) {
+          iIdx = list.findIndex(item => item._rowNum === entry.row);
+        }
+
+        // 3차: 위치 기반 매칭
+        if (iIdx < 0) {
+          const sameIdEntries = entries.filter(e => e.id === entry.id).sort((a,b) => a.row - b.row);
+          const posInSaved = sameIdEntries.indexOf(entry);
+          if (posInSaved >= 0 && posInSaved < list.length) {
+            iIdx = posInSaved;
+          }
+        }
+
+        if (iIdx < 0) { console.log('[restore] 지표 매칭 실패:', entry.id, 'iId:', entry.iId, 'row:', entry.row); return; }
+
+        const key = pageIdx + '-' + type + '-' + iIdx;
+        responses[key] = { rating: entry.rating, reason: entry.reason || '' };
+        totalRestored++;
+      });
+    });
+
+    console.log('[restore] 총 복원된 평정:', totalRestored);
+  }
+
+  /* GAS에서 받은 배열을 E-ID별로 그룹핑 (페이지 = e-id 탭 기준)
+     하위호환: 기존 GAS가 'ID'만 반환하는 경우에도 동작 */
+  function groupByIdFromGAS(arr) {
+    const map = {};
+    arr.forEach((row, i) => {
+      const eId = row['E-ID'] || row.ID || '';
+      if (!eId) return;
+      if (!map[eId]) map[eId] = [];
+      row._csvRow = i;
+      map[eId].push(row);
+    });
+    return map;
+  }
+
+  /* ════════════════════ 페이지 렌더링 ════════════════════ */
+  function renderPage() {
+    if (!idRows.length) return;
+    const row = idRows[currentIndex];
+    const id = row['E-ID'] || row.ID || '';
+
+    // ── 헤더 ──
+    document.getElementById('idBadge').textContent = id.replace(/^ID[_\-\s]*/i, '');
+    document.getElementById('headerTitle').textContent = row.category || '';
+      `전체 ${String(idRows.length).padStart(2,'0')}개 항목 중 ${currentIndex+1}번째 진행중...`;
+
+    // ── 교육활동 ──
+    renderCard('edu', row, 'element_edu-act', 'descript_edu-act', eduIndices, 'labelEduElement', 'bodyEdu', 'btnDescEdu', 'cardEdu');
+    // ── 하화활동 ──
+    renderCard('hahwa', row, 'element_hahwa-act', 'descript_hahwa-act', hahwaIndices, 'labelHahwaElement', 'bodyHahwa', 'btnDescHahwa', 'cardHahwa');
+    // ── 상구활동 ──
+    renderCard('sanggu', row, 'element_sanggu-act', 'descript_sanggu-act', sangguIndices, 'labelSangguElement', 'bodySanggu', 'btnDescSanggu', 'cardSanggu');
+
+    // 진행 상태
+    document.getElementById('progressBottom').textContent = `${currentIndex+1}/${idRows.length}`;
+
+    // 네비게이션
+    document.getElementById('navPrevCol').style.visibility = (currentIndex === 0) ? 'hidden' : 'visible';
+    document.getElementById('btnPrev').disabled = (currentIndex === 0);
+    document.getElementById('navNextCol').style.visibility = 'visible';
+    document.getElementById('btnNext').disabled = false;
+
+    // 설문/완료 페이지 표시
+    document.getElementById('completionPage').style.display = 'none';
+    document.querySelectorAll('.indicator-card').forEach(c => c.style.display = '');
+    document.getElementById('progressBottom').style.display = '';
+
+
+
+  }
+
+  function renderCard(type, idRow, elemKey, descKey, indicesMap, labelElId, bodyElId, descBtnId, cardElId) {
+    const id = idRow['E-ID'] || idRow.ID || '';
+    const elemName = idRow[elemKey] || '';
+    const elemDesc = idRow[descKey] || '';
+    const list = indicesMap[id] || [];
+
+    // 요소 라벨
+    document.getElementById(labelElId).textContent = elemName ? '(평정 요소) ' + elemName : '';
+
+    // 설명 버튼
+    const descBtn = document.getElementById(descBtnId);
+    const catName = idRow.category || '';
+    descBtn.dataset.desc  = elemDesc || '설명 없음';
+    descBtn.dataset.title = (catName ? catName + ' - ' : '') + elemName + ' 요소 설명';
+
+    // 카드 표시/숨김
+    const card = document.getElementById(cardElId);
+    if (list.length === 0 && !elemName) {
+      card.style.display = 'none';
+      return;
+    }
+    card.style.display = '';
+
+    // 지표 목록 렌더
+    const body = document.getElementById(bodyElId);
+    if (list.length === 0) {
+      body.innerHTML = '<div style="padding:12px 0;color:var(--ink-soft);font-size:14px;">해당 요소에 대한 지표가 없습니다.</div>';
+      return;
+    }
+
+    let html = '';
+    list.forEach((item, iIdx) => {
+      const key = currentIndex + '-' + type + '-' + iIdx;
+      const saved = responses[key] || {};
+      const indexText = item.index || '';
+
+      // 내어쓰기 계산
+      const bp = indexText.indexOf('] ');
+      const hang = bp !== -1 ? (bp + 1) * 0.5 : 2;
+
+      const showReason = saved.rating === 1 || saved.rating === 2;
+
+      // 내어쓰기 +3ch 추가
+      const hangVal = hang + 4;
+
+      // 추가 사유 확인 버튼 (1차 추가 의견과 매칭)
+      let addReasonBtn = '';
+      if (addReasonData.length > 0) {
+        const eid = idRow['E-ID'] || idRow.ID || '';
+        const addIndexKey = type === 'edu' ? 'Index_edu_act' : type === 'hahwa' ? 'Index_hahwa_act' : 'Index_sanggu_act';
+        const addDescKey = type === 'edu' ? 'descrpt_index_edu_act' : type === 'hahwa' ? 'descrpt_index_hawha_act' : 'descrpt_index_sanggu_act';
+        const match = addReasonData.find(a => {
+          if (a.ID !== eid) return false;
+          const addText = (a[addIndexKey] || '').trim();
+          if (!addText) return false;
+          return indexText.includes(addText) || addText.includes(indexText);
+        });
+        if (match && (match[addDescKey] || match.panel)) {
+          const panel = esc(match.panel || '');
+          const reason = esc(match[addDescKey] || '(사유 미기재)');
+          addReasonBtn = ` <button class="btn-add-reason" onclick="showAddReasonModal('${panel}', '${reason.replace(/'/g,"\\'")}')">추가 사유 확인</button>`;
+        }
+      }
+
+      html += `<div class="index-item" data-key="${key}">`;
+      html += `  <div class="index-left">`;
+      html += `    <div class="index-text" style="--hang:${hangVal}ch">${esc(indexText)}${addReasonBtn}</div>`;
+      html += `  </div>`;
+      html += `  <div class="index-right">`;
+      html += `    <div class="rating-row">`;
+      html += `      <div class="rating-group">`;
+      for (let r = 1; r <= 4; r++) {
+        const sel = saved.rating === r ? ' selected' : '';
+        const tooltip = RATING_LABELS[r-1].replace('\n',' ');
+        if (r > 1) html += `<span class="rating-dot-line"></span>`;
+        html += `<button class="rating-btn${sel}" data-key="${key}" data-val="${r}" title="${tooltip}">`;
+        html += `  <span class="r-num">${r}</span><span class="r-lbl"></span>`;
+        html += `</button>`;
+      }
+      html += `      </div>`;
+      html += `    </div>`;
+      html += `  </div>`;
+      html += `  <div class="reason-row${showReason ? ' show' : ''}" data-reason="${key}">`;
+      html += `    <span class="reason-label">사유</span>`;
+      const reasonPH = saved.rating === 1 ? '매우 부적절로 판단하신 이유를 기술해주세요.' : '부적절로 판단하신 이유를 기술해주세요.';
+      html += `    <textarea class="reason-input" data-key="${key}" placeholder="${reasonPH}">${esc(saved.reason || '')}</textarea>`;
+      html += `  </div>`;
+      html += `</div>`;
+    });
+
+    body.innerHTML = html;
+
+    // 이벤트 바인딩: 평정 버튼
+    body.querySelectorAll('.rating-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const k = btn.dataset.key;
+        const v = parseInt(btn.dataset.val, 10);
+        if (!responses[k]) responses[k] = {};
+        const group = btn.closest('.rating-group');
+        const reasonRow = body.querySelector(`.reason-row[data-reason="${k}"]`);
+
+        if (responses[k].rating === v) {
+          // 이미 선택된 점수 → 선택 해제 (0으로 표시하여 저장 시 공백 처리)
+          responses[k].rating = 0;
+          btn.classList.remove('selected');
+          if (reasonRow) reasonRow.classList.remove('show');
+        } else {
+          // 새 점수 선택
+          responses[k].rating = v;
+          group.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          if (reasonRow) {
+            if (v <= 2) {
+              reasonRow.classList.add('show');
+              const ta = reasonRow.querySelector('.reason-input');
+              if (ta) ta.placeholder = v === 1 ? '매우 부적절로 판단하신 이유를 기술해주세요.' : '부적절로 판단하신 이유를 기술해주세요.';
+            }
+            else { reasonRow.classList.remove('show'); }
+          }
+        }
+
+        /* (#2, #5) 현재 페이지를 dirty로 마킹 */
+        dirtyPages.add(currentIndex);
+      });
+    });
+
+    // 이벤트 바인딩: 사유 입력
+    body.querySelectorAll('.reason-input').forEach(ta => {
+      ta.addEventListener('input', () => {
+        const k = ta.dataset.key;
+        if (!responses[k]) responses[k] = {};
+        responses[k].reason = ta.value;
+
+        /* (#2, #5) 현재 페이지를 dirty로 마킹 */
+        dirtyPages.add(currentIndex);
+      });
+    });
+  }
+
+  /* (미응답 요약 제거됨) */
+
+  /* ════════════════════ 완료 페이지 ════════════════════ */
+  let onCompletionPage = false;
+
+  function showCompletionPage() {
+    document.querySelectorAll('.indicator-card').forEach(c => c.style.display = 'none');
+    document.getElementById('completionPage').style.display = 'flex';
+    document.getElementById('progressBottom').style.display = 'none';
+
+    document.getElementById('navNextCol').style.visibility = 'hidden';
+    document.getElementById('navPrevCol').style.visibility = 'visible';
+    document.getElementById('btnPrev').disabled = false;
+
+    /* (#4) 재제출 여부에 따라 텍스트/버튼 변경 */
+    const questionEl = document.getElementById('completionQuestion');
+    const btnComplete = document.getElementById('btnComplete');
+    if (isResubmit) {
+      questionEl.textContent = '설문 응답을 수정하시겠습니까?';
+      btnComplete.textContent = '응답 수정';
+    } else {
+      questionEl.textContent = '설문을 완료하시겠습니까?';
+      btnComplete.textContent = '설문 완료';
+    }
+  }
+
+  /* ════════════════════ 저장 (GAS) ════════════════════ */
+  /* ════════════════════ 추가 사유 확인 모달 ════════════════════ */
+  function showAddReasonModal(panel, reason) {
+    document.getElementById('addReasonModalTitle').textContent = '추가 사유';
+    document.getElementById('addReasonModalBody').innerHTML = reason
+      ? '<p>' + reason + '</p>'
+      : '<p style="color:#bbb;font-style:italic">사유가 기재되지 않았습니다.</p>';
+    document.getElementById('addReasonModal').classList.add('active');
+  }
+  document.getElementById('addReasonModalClose').addEventListener('click', () => document.getElementById('addReasonModal').classList.remove('active'));
+
+  async function gasCall(payload) {
+    const res = await fetch(GAS_URL, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(payload) });
+    const t = await res.text();
+    try { return JSON.parse(t); } catch { return { status:'error', message:'GAS 응답 파싱 실패: '+t }; }
+  }
+
+  async function saveCurrentPage() {
+    const id = idRows[currentIndex]['E-ID'] || idRows[currentIndex].ID;
+    const col = getPanelCol();
+    if (!col) { showToast('패널 번호가 설정되지 않았습니다.', 3000); return; }
+
+    const payload = {
+      action: 'saveRatings',
+      panelCol: col,
+      panelEmail: panelEmail,
+      pageId: id,
+      ratings: []
+    };
+
+    ['edu','hahwa','sanggu'].forEach(type => {
+      const map = type === 'edu' ? eduIndices : type === 'hahwa' ? hahwaIndices : sangguIndices;
+      const sheetName = type === 'edu' ? 'edu-act_index' : type === 'hahwa' ? 'hahwa-act_index' : 'sanggu-act_index';
+      const list = map[id] || [];
+      list.forEach((item, iIdx) => {
+        const key = currentIndex + '-' + type + '-' + iIdx;
+        const resp = responses[key];
+        if (resp && resp.rating !== undefined) {
+          payload.ratings.push({
+            sheet: sheetName,
+            rowNum: item._rowNum || (DATA_START_ROW + item._csvRow),
+            iId: item['I-ID'] || '',
+            rating: resp.rating,
+            reason: resp.reason || ''
+          });
+        }
+      });
+    });
+
+    if (payload.ratings.length === 0) {
+      showToast('평정된 항목이 없습니다.', 2000);
+      return;
+    }
+
+    const btn = document.getElementById('btnSave');
+    btn.disabled = true; btn.textContent = '저장 중…';
+    try {
+      const result = await gasCall(payload);
+      if (result.status !== 'ok') throw new Error(result.message || '저장 실패');
+      /* (#5) 저장 성공 시 dirty 해제 */
+      dirtyPages.delete(currentIndex);
+      showToast('저장되었습니다.');
+    } catch(e) {
+      showToast('저장 오류: ' + e.message, 4000);
+    } finally {
+      btn.disabled = false; btn.textContent = '저장';
+    }
+  }
+
+  document.getElementById('btnSave').addEventListener('click', () => {
+    saveCurrentPage();
+  });
+
+  /* ════════════════════ 설문 완료 ════════════════════ */
+  const doneModal = document.getElementById('doneModal');
+
+  /* (#3) 제출 확인 모달 핸들러 */
+  const submitConfirmModal = document.getElementById('submitConfirmModal');
+  document.getElementById('submitConfirmCancel').addEventListener('click', () => {
+    submitConfirmModal.classList.remove('active');
+  });
+
+  document.getElementById('submitConfirmOk').addEventListener('click', () => {
+    submitConfirmModal.classList.remove('active');
+    doCompleteSurvey();
+  });
+
+  /* (#3) btnComplete 클릭 시 확인 모달 먼저 표시 */
+  document.getElementById('btnComplete').addEventListener('click', async () => {
+    // 미평정 확인
+    let totalUnrated = 0;
+    idRows.forEach((row, pageIdx) => {
+      ['edu','hahwa','sanggu'].forEach(type => {
+        const map = type === 'edu' ? eduIndices : type === 'hahwa' ? hahwaIndices : sangguIndices;
+        const list = map[row['E-ID'] || row.ID] || [];
+        list.forEach((_, iIdx) => {
+          const key = pageIdx + '-' + type + '-' + iIdx;
+          if (!responses[key] || !responses[key].rating) totalUnrated++;
+        });
+      });
+    });
+
+    if (totalUnrated > 0) {
+      showInfoModal(`아직 ${totalUnrated}개 지표가 미평정 상태입니다.\n모든 지표를 평정한 후 완료해주세요.`);
+      return;
+    }
+
+    // (#3) 제출 확인 모달 표시
+    submitConfirmModal.classList.add('active');
+  });
+
+  /* (#3) 실제 설문 완료 처리 함수 */
+  async function doCompleteSurvey() {
+    const btn = document.getElementById('btnComplete');
+    const originalBtnText = btn.textContent;
+    btn.disabled = true; btn.textContent = '처리 중…';
+    try {
+      // 전체 응답 저장
+      const col = getPanelCol();
+      const allRatings = [];
+      idRows.forEach((row, pageIdx) => {
+        ['edu','hahwa','sanggu'].forEach(type => {
+          const map = type === 'edu' ? eduIndices : type === 'hahwa' ? hahwaIndices : sangguIndices;
+          const sheetName = type === 'edu' ? 'edu-act_index' : type === 'hahwa' ? 'hahwa-act_index' : 'sanggu-act_index';
+          const list = map[row['E-ID'] || row.ID] || [];
+          list.forEach((item, iIdx) => {
+            const key = pageIdx + '-' + type + '-' + iIdx;
+            const resp = responses[key];
+            if (resp && resp.rating !== undefined) {
+              allRatings.push({
+                sheet: sheetName,
+                csvRow: item._csvRow,
+                rowNum: item._rowNum || 0,
+                iId: item['I-ID'] || '',
+                rating: resp.rating,
+                reason: resp.reason || ''
+              });
+            }
+          });
+        });
+      });
+
+      const saveResult = await gasCall({
+        action: 'saveAllRatings',
+        panelCol: col,
+        panelEmail: panelEmail,
+        ratings: allRatings
+      });
+      if (saveResult.status !== 'ok') throw new Error(saveResult.message || '저장 실패');
+
+      // 완료 상태 기록
+      const compResult = await fetch(BASIC_GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'completeSurvey',
+          email: panelEmail,
+          round: 2
+        })
+      });
+      const compText = await compResult.text();
+      let compParsed;
+      try { compParsed = JSON.parse(compText); } catch { compParsed = { status:'error', message: compText }; }
+      if (compParsed.status !== 'ok') {
+        showToast('완료 처리 오류: ' + (compParsed.message || '알 수 없는 오류'), 4000);
+        btn.disabled = false; btn.textContent = originalBtnText;
+        return;
+      }
+    } catch(e) {
+      console.error('[completeSurvey 에러]', e);
+      showToast('서버 통신 오류: ' + e.message, 4000);
+      btn.disabled = false; btn.textContent = isResubmit ? '응답 수정' : '설문 완료';
+      return;
+    }
+    /* (#5) 완료 후 dirty 전부 클리어 */
+    dirtyPages.clear();
+    btn.disabled = false; btn.textContent = isResubmit ? '응답 수정' : '설문 완료';
+    doneModal.classList.add('active');
+  }
+
+  document.getElementById('doneModalOk').addEventListener('click', () => {
+    location.href = 'select_delphi.html?refresh=1';
+  });
+
+  /* ════════════════════ 네비게이션 ════════════════════ */
+  /* 현재 페이지에 평정된 항목이 있는지 확인 */
+  function hasRatingsOnCurrentPage() {
+    if (!idRows.length) return false;
+    const id = idRows[currentIndex]['E-ID'] || idRows[currentIndex].ID;
+    let found = false;
+    ['edu','hahwa','sanggu'].forEach(type => {
+      const map = type === 'edu' ? eduIndices : type === 'hahwa' ? hahwaIndices : sangguIndices;
+      const list = map[id] || [];
+      list.forEach((_, iIdx) => {
+        const key = currentIndex + '-' + type + '-' + iIdx;
+        if (responses[key] && responses[key].rating !== undefined) found = true;
+      });
+    });
+    return found;
+  }
+
+  /* 현재 페이지에 미평정 지표 수 */
+  function countUnratedOnCurrentPage() {
+    if (!idRows.length) return 0;
+    const id = idRows[currentIndex]['E-ID'] || idRows[currentIndex].ID;
+    let unrated = 0;
+    ['edu','hahwa','sanggu'].forEach(type => {
+      const map = type === 'edu' ? eduIndices : type === 'hahwa' ? hahwaIndices : sangguIndices;
+      const list = map[id] || [];
+      list.forEach((_, iIdx) => {
+        const key = currentIndex + '-' + type + '-' + iIdx;
+        if (!responses[key] || !responses[key].rating) unrated++;
+      });
+    });
+    return unrated;
+  }
+
+  /* (#2, #5, #7) 자동 저장 — dirty 페이지만 저장 + 진행바 표시 */
+  async function autoSaveCurrentPage() {
+    /* (#5) dirty tracking: 수정된 페이지만 저장 */
+    if (!dirtyPages.has(currentIndex)) return;
+    if (!hasRatingsOnCurrentPage()) return;
+    const col = getPanelCol();
+    if (!col) return;
+    const id = idRows[currentIndex]['E-ID'] || idRows[currentIndex].ID;
+    const payload = { action:'saveRatings', panelCol:col, panelEmail:panelEmail, pageId:id, ratings:[] };
+    ['edu','hahwa','sanggu'].forEach(type => {
+      const map = type === 'edu' ? eduIndices : type === 'hahwa' ? hahwaIndices : sangguIndices;
+      const sheetName = type === 'edu' ? 'edu-act_index' : type === 'hahwa' ? 'hahwa-act_index' : 'sanggu-act_index';
+      const list = map[id] || [];
+      list.forEach((item, iIdx) => {
+        const key = currentIndex + '-' + type + '-' + iIdx;
+        const resp = responses[key];
+        if (resp && resp.rating !== undefined) {
+          payload.ratings.push({ sheet:sheetName, rowNum:item._rowNum||(3+item._csvRow), iId:item['I-ID']||'', rating:resp.rating, reason:resp.reason||'' });
+        }
+      });
+    });
+    if (payload.ratings.length === 0) return;
+
+    /* (#6) 진행바 표시 */
+    showAutosaveProgress(true);
+    try {
+      await gasCall(payload);
+      /* (#5) 저장 성공 시 dirty 해제 */
+      dirtyPages.delete(currentIndex);
+      showToast('자동 저장됨', 1200);
+    } catch(e) { console.warn('[autoSave 에러]', e); }
+    finally {
+      showAutosaveProgress(false);
+    }
+  }
+
+  /* 미평정 확인 모달 */
+  const unratedNavModal = document.getElementById('unratedNavModal');
+  let pendingNavDir = 0;
+
+  document.getElementById('unratedNavCancel').addEventListener('click', () => {
+    unratedNavModal.classList.remove('active');
+    pendingNavDir = 0;
+  });
+
+  document.getElementById('unratedNavConfirm').addEventListener('click', async () => {
+    unratedNavModal.classList.remove('active');
+    await doNavigate(pendingNavDir);
+    pendingNavDir = 0;
+  });
+
+  /* (#7) 실제 이동 수행 — 이전/다음 모두 자동 저장 (doNavigate에서 처리) */
+  async function doNavigate(dir) {
+    // (#7) 자동 저장 — 이전/다음 모두 동일하게 수행
+    await autoSaveCurrentPage();
+
+    if (onCompletionPage && dir === -1) {
+      onCompletionPage = false;
+      renderPage();
+      window.scrollTo({ top:0, behavior:'smooth' });
+      return;
+    }
+    if (dir === 1 && currentIndex >= idRows.length - 1 && !onCompletionPage) {
+      onCompletionPage = true;
+      showCompletionPage();
+      window.scrollTo({ top:0, behavior:'smooth' });
+      return;
+    }
+    const ni = currentIndex + dir;
+    if (ni < 0 || ni >= idRows.length) return;
+    onCompletionPage = false;
+    currentIndex = ni;
+    renderPage();
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+
+  /* 네비게이션 진입점: 미평정 확인 후 이동 */
+  async function navigate(dir) {
+    // 완료 페이지에서 뒤로 갈 때는 바로 이동
+    if (onCompletionPage && dir === -1) { await doNavigate(dir); return; }
+
+    // 미평정 확인
+    const unrated = countUnratedOnCurrentPage();
+    if (unrated > 0 && !onCompletionPage) {
+      document.getElementById('unratedNavMsg').innerHTML =
+        `현재 페이지에 <strong>${unrated}개</strong> 미평정 지표가 있습니다.<br>그래도 이동하시겠습니까?`;
+      pendingNavDir = dir;
+      unratedNavModal.classList.add('active');
+      return;
+    }
+
+    await doNavigate(dir);
+  }
+
+  document.getElementById('btnPrev').addEventListener('click', ()=>navigate(-1));
+  document.getElementById('btnNext').addEventListener('click', ()=>navigate(1));
+
+  document.addEventListener('keydown', e => {
+    const anyModal = descModal.classList.contains('active') || endModal.classList.contains('active')
+        || document.getElementById('saveConfirmModal').classList.contains('active')
+        || infoModal.classList.contains('active')
+        || submitConfirmModal.classList.contains('active')
+        || unratedNavModal.classList.contains('active')
+        || retryModal.classList.contains('active')
+        || doneModal.classList.contains('active')
+        || document.getElementById('addReasonModal').classList.contains('active')
+        || guideModal.classList.contains('active');
+    if (anyModal) {
+      if (e.key==='Escape') {
+        closeDescModal();
+        if (typeof resetEndModalPos==='function') resetEndModalPos(); endModal.classList.remove('active');
+        if (typeof resetSaveConfirmPos==='function') resetSaveConfirmPos(); document.getElementById('saveConfirmModal').classList.remove('active');
+        if (typeof resetInfoModalPos==='function') resetInfoModalPos(); infoModal.classList.remove('active');
+        if (typeof resetSubmitConfirmPos==='function') resetSubmitConfirmPos(); submitConfirmModal.classList.remove('active');
+        if (typeof resetUnratedNavModalPos==='function') resetUnratedNavModalPos(); unratedNavModal.classList.remove('active'); pendingNavDir=0;
+        if (typeof resetRetryModalPos==='function') resetRetryModalPos(); retryModal.classList.remove('active');
+        if (typeof resetDoneModalPos==='function') resetDoneModalPos(); doneModal.classList.remove('active');
+        if (typeof resetAddReasonModalPos==='function') resetAddReasonModalPos(); document.getElementById('addReasonModal').classList.remove('active');
+        if (typeof resetGuideModalPos==='function') { resetGuideModalPos(); guideModal.classList.remove('active'); guideIframe.src='about:blank'; }
+      }
+      return;
+    }
+    if (e.key==='ArrowLeft')  navigate(-1);
+    if (e.key==='ArrowRight') navigate(1);
+  });
+
+  /* ════════════════════ 지표 설명 드래그 모달 ════════════════════ */
+  const descOverlay = document.getElementById('descOverlay');
+  const descModal   = document.getElementById('descModal');
+  const descHeader  = document.getElementById('descModalHeader');
+
+  function openDescModal(title, text) {
+    descFontScale = 100;
+    applyDescFontScale();
+    document.getElementById('descModalTitle').textContent = title;
+    const body = document.getElementById('descModalBody');
+    const paras = text.split(/\n+/).filter(p=>p.trim());
+    body.innerHTML = paras.length <= 1
+      ? '<p>'+esc(text)+'</p>'
+      : paras.map(p=>'<p>'+esc(p.trim())+'</p>').join('');
+    descModal.style.cssText = 'top:50%;left:50%;transform:translate(-50%,-50%)';
+    descOverlay.classList.add('active');
+    descModal.classList.add('active');
+  }
+  function closeDescModal() { descOverlay.classList.remove('active'); descModal.classList.remove('active'); }
+
+  document.querySelectorAll('.btn-desc').forEach(btn => {
+    btn.addEventListener('click', () => openDescModal(btn.dataset.title || '요소 설명', btn.dataset.desc || '설명 없음'));
+  });
+  document.getElementById('descModalClose').addEventListener('click', closeDescModal);
+  descOverlay.addEventListener('click', closeDescModal);
+
+  // 드래그
+  let isDrag=false, dOX=0, dOY=0;
+  descHeader.addEventListener('mousedown', e => {
+    if (e.target.closest('.desc-modal-right')) return;
+    isDrag=true; const r=descModal.getBoundingClientRect();
+    dOX=e.clientX-r.left; dOY=e.clientY-r.top;
+    descModal.style.transform='none'; descModal.style.left=r.left+'px'; descModal.style.top=r.top+'px';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => { if(!isDrag)return; descModal.style.left=(e.clientX-dOX)+'px'; descModal.style.top=(e.clientY-dOY)+'px'; });
+  document.addEventListener('mouseup', ()=>{ isDrag=false; });
+  descHeader.addEventListener('touchstart', e => {
+    if (e.target.closest('.desc-modal-right')) return;
+    isDrag=true; const t=e.touches[0], r=descModal.getBoundingClientRect();
+    dOX=t.clientX-r.left; dOY=t.clientY-r.top;
+    descModal.style.transform='none'; descModal.style.left=r.left+'px'; descModal.style.top=r.top+'px';
+  }, {passive:true});
+  document.addEventListener('touchmove', e => { if(!isDrag)return; const t=e.touches[0]; descModal.style.left=(t.clientX-dOX)+'px'; descModal.style.top=(t.clientY-dOY)+'px'; }, {passive:true});
+  document.addEventListener('touchend', ()=>{ isDrag=false; });
+
+  /* ════════════════════ 안내 모달 ════════════════════ */
+  const infoModal = document.getElementById('infoModal');
+  function showInfoModal(msg) {
+    document.getElementById('infoModalMsg').innerHTML = msg.replace(/\n/g, '<br>');
+    infoModal.classList.add('active');
+  }
+  document.getElementById('infoModalOk').addEventListener('click', () => infoModal.classList.remove('active'));
+
+  /* ════════════════════ 종료 ════════════════════ */
+  const endModal = document.getElementById('endModal');
+  document.getElementById('btnEnd').addEventListener('click', ()=> endModal.classList.add('active'));
+  document.getElementById('endModalCancel').addEventListener('click', ()=> endModal.classList.remove('active'));
+  document.getElementById('endModalConfirm').addEventListener('click', ()=> {
+    location.href = 'select_delphi.html?refresh=1';
+  });
+
+  /* ════════════════════ 글자 크기 조절 (메인) ════════════════════ */
+  let fontScale = 100;
+  const FONT_MIN = 70, FONT_MAX = 140, FONT_STEP = 10;
+
+  function applyFontScale() {
+    const container = document.querySelector('.cards-container');
+    const ratio = fontScale / 100;
+    container.style.zoom = ratio;
+    container.style.webkitTextSizeAdjust = fontScale + '%';
+    document.getElementById('fontScaleLabel').textContent = fontScale + '%';
+    document.getElementById('btnFontDown').disabled = (fontScale <= FONT_MIN);
+    document.getElementById('btnFontUp').disabled = (fontScale >= FONT_MAX);
+  }
+
+  document.getElementById('btnFontUp').addEventListener('click', function(e) {
+    e.preventDefault(); e.stopPropagation();
+    if (fontScale >= FONT_MAX) return;
+    fontScale += FONT_STEP;
+    applyFontScale();
+  });
+  document.getElementById('btnFontDown').addEventListener('click', function(e) {
+    e.preventDefault(); e.stopPropagation();
+    if (fontScale <= FONT_MIN) return;
+    fontScale -= FONT_STEP;
+    applyFontScale();
+  });
+
+  /* ════════════════════ 글자 크기 조절 (모달) ════════════════════ */
+  let descFontScale = 100;
+  const DESC_FONT_MIN = 70, DESC_FONT_MAX = 160;
+
+  function applyDescFontScale() {
+    const body = document.getElementById('descModalBody');
+    const ratio = descFontScale / 100;
+    body.style.zoom = ratio;
+    body.style.webkitTextSizeAdjust = descFontScale + '%';
+    document.getElementById('descFontLabel').textContent = descFontScale + '%';
+    document.getElementById('descFontDown').disabled = (descFontScale <= DESC_FONT_MIN);
+    document.getElementById('descFontUp').disabled = (descFontScale >= DESC_FONT_MAX);
+  }
+
+  document.getElementById('descFontUp').addEventListener('click', function(e) {
+    e.preventDefault(); e.stopPropagation();
+    if (descFontScale >= DESC_FONT_MAX) return;
+    descFontScale += FONT_STEP;
+    applyDescFontScale();
+  });
+  document.getElementById('descFontDown').addEventListener('click', function(e) {
+    e.preventDefault(); e.stopPropagation();
+    if (descFontScale <= DESC_FONT_MIN) return;
+    descFontScale -= FONT_STEP;
+    applyDescFontScale();
+  });
+
+  /* ════════════════════ 모달 드래그 (공통) ════════════════════ */
+  function setupModalDrag(overlay, box, handle) {
+    let dragging = false, didDrag = false, ox = 0, oy = 0;
+    function onDown(cx, cy, evt) {
+      dragging = true; didDrag = false;
+      const r = box.getBoundingClientRect();
+      ox = cx - r.left; oy = cy - r.top;
+      box.style.position = 'fixed';
+      box.style.margin = '0';
+      box.style.left = r.left + 'px';
+      box.style.top = r.top + 'px';
+      box.style.transform = 'none';
+      if (evt && evt.preventDefault) evt.preventDefault();
+    }
+    function onMove(cx, cy) { if (!dragging) return; didDrag = true; box.style.left = (cx - ox) + 'px'; box.style.top = (cy - oy) + 'px'; }
+    function onUp() { dragging = false; }
+    handle.addEventListener('mousedown', e => { if (e.target.closest('button') || e.target.closest('.desc-modal-right')) return; onDown(e.clientX, e.clientY, e); });
+    document.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
+    document.addEventListener('mouseup', onUp);
+    handle.addEventListener('touchstart', e => { if (e.target.closest('button') || e.target.closest('.desc-modal-right')) return; const t = e.touches[0]; onDown(t.clientX, t.clientY); }, { passive: true });
+    document.addEventListener('touchmove', e => { if (!dragging) return; const t = e.touches[0]; onMove(t.clientX, t.clientY); }, { passive: true });
+    document.addEventListener('touchend', onUp);
+    if (overlay) {
+      overlay.addEventListener('click', e => { if (e.target === overlay && !didDrag) overlay.classList.remove('active'); });
+    }
+    function resetPos() { box.style.position = ''; box.style.margin = ''; box.style.left = ''; box.style.top = ''; box.style.transform = ''; }
+    return resetPos;
+  }
+
+  /* ── 각 모달에 드래그 적용 ── */
+  const resetRetryModalPos = setupModalDrag(retryModal, document.getElementById('retryModalBox'), document.getElementById('retryMsg'));
+  const resetUnratedNavModalPos = setupModalDrag(unratedNavModal, document.getElementById('unratedNavModalBox'), document.getElementById('unratedNavMsg'));
+  const resetEndModalPos = setupModalDrag(endModal, document.getElementById('endModalBox'), document.getElementById('endModalMsg'));
+  const resetSaveConfirmPos = setupModalDrag(document.getElementById('saveConfirmModal'), document.getElementById('saveConfirmBox'), document.getElementById('saveConfirmMsg'));
+  const resetSubmitConfirmPos = setupModalDrag(submitConfirmModal, document.getElementById('submitConfirmBox'), document.getElementById('submitConfirmMsg'));
+  const resetDoneModalPos = setupModalDrag(doneModal, document.getElementById('doneModalBox'), document.getElementById('doneModalMsg'));
+  const resetInfoModalPos = setupModalDrag(infoModal, document.getElementById('infoModalBox'), document.getElementById('infoModalMsg'));
+  const resetAddReasonModalPos = setupModalDrag(document.getElementById('addReasonModal'), document.getElementById('addReasonModalBox'), document.getElementById('addReasonModalTitle'));
+
+  /* ── 가이드 모달 ── */
+  const guideModal = document.getElementById('guideModal');
+  const guideModalBox = document.getElementById('guideModalBox');
+  const guideIframe = document.getElementById('guideIframe');
+  const resetGuideModalPos = setupModalDrag(guideModal, guideModalBox, document.getElementById('guideModalHeader'));
+  document.getElementById('btnGuide').addEventListener('click', () => {
+    guideIframe.src = '2nd_delphi_guide.html?embed=1';
+    resetGuideModalPos();
+    guideModal.classList.add('active');
+  });
+  document.getElementById('guideModalClose').addEventListener('click', () => {
+    resetGuideModalPos();
+    guideModal.classList.remove('active');
+    guideIframe.src = 'about:blank';
+  });
+
+  loadData();
+</script>
+</body>
+</html>
