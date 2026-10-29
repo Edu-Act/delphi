@@ -33,52 +33,52 @@
       background: var(--card-bg);
       border-radius: 4px;
       border-top: 4px solid var(--accent);
-      max-width: 1100px; width: 100%;
-      padding: 40px 52px 40px;
+      max-width: 920px; width: 100%;
+      padding: 32px 40px 32px;
       box-shadow: 0 2px 16px rgba(26,26,46,.08), 0 1px 4px rgba(26,26,46,.06);
       position: relative;
     }
 
     /* 관리자 트리거 */
     .expand-icon {
-      position: absolute; top: 14px; right: 16px;
-      font-size: 18px; color: var(--ink-soft);
+      position: absolute; top: 12px; right: 14px;
+      font-size: 16px; color: var(--ink-soft);
       cursor: pointer; text-decoration: none; transition: color .2s;
     }
     .expand-icon:hover { color: var(--ink); }
 
     /* 인사말 */
     .greeting {
-      font-size: 17px; font-weight: 500;
-      color: var(--ink); margin-bottom: 4px;
+      font-size: 15px; font-weight: 500;
+      color: var(--ink); margin-bottom: 3px;
     }
 
     .divider {
       border: none; border-top: 1px solid var(--divider);
-      margin: 20px 0 24px;
+      margin: 16px 0 20px;
     }
 
     /* 본문 */
     .body-text {
-      font-size: 16px; line-height: 1.8;
+      font-size: 14px; line-height: 1.8;
       color: var(--ink-mid);
       text-align: justify; word-break: keep-all;
     }
-    .body-text p { margin-bottom: 18px; text-indent: 1em; }
+    .body-text p { margin-bottom: 14px; text-indent: 1em; }
     .body-text p:last-child { margin-bottom: 0; }
 
     /* 서명 */
     .signature {
-      margin-top: 24px; text-align: right;
-      font-size: 16px; color: var(--ink-soft);
+      margin-top: 20px; text-align: right;
+      font-size: 14px; color: var(--ink-soft);
     }
 
     /* 참고문헌 */
     .references {
-      margin-top: 20px;
-      padding-top: 20px;
+      margin-top: 16px;
+      padding-top: 16px;
       border-top: 1px solid var(--divider);
-      font-size: 14px; line-height: 2.0;
+      font-size: 12.5px; line-height: 1.9;
       color: var(--ink-soft);
     }
 
@@ -86,33 +86,33 @@
     .login-card {
       background: var(--card-bg);
       border-radius: 4px;
-      max-width: 1100px; width: 100%;
-      margin-top: 16px;
-      padding: 32px 52px;
+      max-width: 920px; width: 100%;
+      margin-top: 14px;
+      padding: 24px 40px;
       box-shadow: 0 2px 16px rgba(26,26,46,.08), 0 1px 4px rgba(26,26,46,.06);
       display: flex; align-items: center;
       justify-content: center; gap: 48px;
     }
 
-    .login-fields { display: flex; flex-direction: column; gap: 22px; }
+    .login-fields { display: flex; flex-direction: column; gap: 18px; }
 
-    .login-row { display: flex; align-items: center; gap: 20px; }
+    .login-row { display: flex; align-items: center; gap: 16px; }
 
     .login-row label {
       font-family: 'Noto Sans KR', sans-serif;
-      font-size: 13px; font-weight: 600;
+      font-size: 12px; font-weight: 600;
       color: var(--ink-soft);
       letter-spacing: .08em;
-      width: 58px; flex-shrink: 0;
+      width: 52px; flex-shrink: 0;
       text-transform: uppercase;
     }
 
     .login-row input {
-      width: 260px;
+      width: 230px;
       border: none; border-bottom: 1.5px solid var(--divider);
       outline: none;
       font-family: 'Noto Sans KR', sans-serif;
-      font-size: 15px; padding: 6px 2px;
+      font-size: 14px; padding: 5px 2px;
       background: transparent; color: var(--ink);
       transition: border-color .2s;
     }
@@ -120,12 +120,12 @@
 
     /* Log-in 버튼 */
     .login-btn {
-      width: 90px; height: 90px;
+      width: 76px; height: 76px;
       border-radius: 50%;
       border: 2px solid var(--accent);
       background: var(--accent);
       font-family: 'Noto Sans KR', sans-serif;
-      font-size: 14px; font-weight: 600;
+      font-size: 13px; font-weight: 600;
       color: #fff; cursor: pointer;
       transition: background .2s, box-shadow .2s;
       box-shadow: 0 2px 8px rgba(74,111,165,.30);
@@ -325,8 +325,8 @@
   </div>
 
   <script>
-    const ADMIN_GAS = 'https://script.google.com/macros/s/AKfycbzDES_x1oHeiC_NbN97iCpwS4bKwY7zGTRFlp_IqmEC4wPbgpzmyDimoPSx5TQPPnfVPQ/exec';
-    const PANEL_GAS = 'https://script.google.com/macros/s/AKfycbxo3RGK4848iyjphwZiKXgkmV1FoKb9Vxjil8TtiZf2zHTvRrkJBNQiH6TG5aCdUWmWSQ/exec';
+    const ADMIN_GAS = 'https://script.google.com/macros/s/AKfycbzNYTtyUdBwiNVQkL0uX0sANUfg-Clb643iLxGaoVppkaNfBO3HvRZbebH3eOoel3clVg/exec';
+    const PANEL_GAS = 'https://script.google.com/macros/s/AKfycbz8foSb3JUvHQRH3Oveylng4W2XRDQvGtPH-v3IWb6_-0Vn2JY_7VH6vBAS5b83_xBeGw/exec';
 
     /* ── 로그인 오류 모달 ── */
     const loginErrorModal   = document.getElementById('loginErrorModal');
@@ -422,7 +422,7 @@
         errorEl.textContent='인증 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
         console.error(err);
       } finally {
-        confirmBtn.disabled=false; confirmBtn.textContent='Confirm';
+        confirmBtn.disabled=false; confirmBtn.textContent='로그인';
       }
     }
 
