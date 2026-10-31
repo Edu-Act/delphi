@@ -195,14 +195,14 @@
     svg+=`<rect x="${PL}" y="${PT}" width="${cw}" height="${ch}" fill="#fafbfd" stroke="#e8e8e8" rx="3"/>`;
     for(let i=0;i<=5;i++){const y=PT+ch/5*i;svg+=`<line x1="${PL}" y1="${y}" x2="${PL+cw}" y2="${y}" stroke="#f0f0f0" stroke-width="0.5"/>`;}
 
-    svg+=`<text x="${x2}" y="${H-3}" font-size="8" fill="#999" text-anchor="middle" font-weight="700" style="cursor:pointer"><title>M=${mDisp2}, SD=${sDisp2}, CVR=${cDisp2}</title>3차 <tspan font-size="10">🔍</tspan></text>`;
-    svg+=`<text x="${x3}" y="${H-3}" font-size="8" fill="#4a6fa5" text-anchor="middle" font-weight="700" style="cursor:pointer"><title>M=${mDisp3}, SD=${sDisp3}, CVR=${cDisp3}</title>4차 <tspan font-size="10">🔍</tspan></text>`;
+    svg+=`<text x="${x2}" y="${H-3}" font-size="8" fill="#999" text-anchor="middle" font-weight="700" style="cursor:pointer"><title>Mdn=${mDisp2}, IQR=${sDisp2}, CVR=${cDisp2}</title>3차 <tspan font-size="10">🔍</tspan></text>`;
+    svg+=`<text x="${x3}" y="${H-3}" font-size="8" fill="#4a6fa5" text-anchor="middle" font-weight="700" style="cursor:pointer"><title>Mdn=${mDisp3}, IQR=${sDisp3}, CVR=${cDisp3}</title>4차 <tspan font-size="10">🔍</tspan></text>`;
 
     // M 라인 + 차이 라벨
     if(m2N!==null&&m3N!==null){
       svg+=`<line x1="${x2}" y1="${m2N}" x2="${x3}" y2="${m3N}" stroke="#4a6fa5" stroke-width="1.5" stroke-dasharray="${m3N<m2N?'':'3,2'}"/>`;
       const mD=fmtDiff(m,rm2);const sD=fmtDiff(s,rs2);const mMidY=Math.min(m2N,m3N)-5;
-      svg+=`<text x="${xMid}" y="${mMidY}" font-size="8.5" fill="#4a6fa5" text-anchor="middle" font-weight="700">M: ${mD} (SD: ${sD})</text>`;
+      svg+=`<text x="${xMid}" y="${mMidY}" font-size="8.5" fill="#4a6fa5" text-anchor="middle" font-weight="700">Mdn: ${mD} (IQR: ${sD})</text>`;
     }
     if(m2N!==null)svg+=`<circle cx="${x2}" cy="${m2N}" r="4" fill="#999" stroke="#fff" stroke-width="1"/><text x="${x2}" y="${m2N-6}" font-size="7.5" fill="#999" text-anchor="middle" font-weight="700">${mDisp2}</text>`;
     if(m3N!==null)svg+=`<circle cx="${x3}" cy="${m3N}" r="4" fill="#4a6fa5" stroke="#fff" stroke-width="1"/><text x="${x3}" y="${m3N-6}" font-size="7.5" fill="#4a6fa5" text-anchor="middle" font-weight="700">${mDisp3}</text>`;
@@ -232,11 +232,11 @@
       const iId=item['I-ID']||'';
 
       const r2=items2nd.find(r=>r['I-ID']===iId)||{};
-      const m2=fmtStat(r2.mean),s2=fmtStat(r2.sd),c2=fmtStat(r2.cvr);
-      const m3=fmtStat(item.mean),s3=fmtStat(item.sd),c3=fmtStat(item.cvr);
+      const m2=fmtStat(r2.median),s2=fmtStat(r2.IQR),c2=fmtStat(r2.cvr);
+      const m3=fmtStat(item.median),s3=fmtStat(item.IQR),c3=fmtStat(item.cvr);
 
       // 트렌드 차트
-      const chart=makeTrendChart(item.mean,item.sd,item.cvr,r2.mean,r2.sd,r2.cvr,m2,s2,c2,m3,s3,c3);
+      const chart=makeTrendChart(item.median,item.IQR,item.cvr,r2.median,r2.IQR,r2.cvr,m2,s2,c2,m3,s3,c3);
 
       const hasOps3=item.reasons&&Object.keys(item.reasons).length>0;
       const hasOps2=r2.reasons&&Object.keys(r2.reasons).length>0;
@@ -264,7 +264,7 @@
       html+=`</div>`; // index-left
 
       // 차트 영역 (클릭시 모달)
-      const chartData=esc(JSON.stringify({m2,s2,c2,m3,s3,c3,rm2:r2.mean,rs2:r2.sd,rc2:r2.cvr,rm3:item.mean,rs3:item.sd,rc3:item.cvr,idx:item.index||''})).replace(/"/g,'&quot;');
+      const chartData=esc(JSON.stringify({m2,s2,c2,m3,s3,c3,rm2:r2.median,rs2:r2.IQR,rc2:r2.cvr,rm3:item.median,rs3:item.IQR,rc3:item.cvr,idx:item.index||''})).replace(/"/g,'&quot;');
       html+=`<div class="result-chart-col">`;
       html+=`  <div class="trend-chart" style="cursor:pointer" onclick="openChartModal(this.dataset.chart)" data-chart="${chartData}">${chart}</div>`;
       html+=`</div>`;
@@ -306,7 +306,7 @@
     if(m2N!==null&&m3N!==null){
       svg+=`<line x1="${x2}" y1="${m2N}" x2="${x3}" y2="${m3N}" stroke="#4a6fa5" stroke-width="2"/>`;
       const mDiffVal=fmtDiff(rm3,rm2);const sDiffVal=fmtDiff(rs3,rs2);const mMidY=Math.min(m2N,m3N)-14;
-      svg+=`<text x="${xMid}" y="${mMidY}" font-size="11" fill="#4a6fa5" text-anchor="middle" font-weight="700">M: ${mDiffVal} (SD: ${sDiffVal})</text>`;
+      svg+=`<text x="${xMid}" y="${mMidY}" font-size="11" fill="#4a6fa5" text-anchor="middle" font-weight="700">Mdn: ${mDiffVal} (IQR: ${sDiffVal})</text>`;
     }
     if(m2N!==null)svg+=`<circle cx="${x2}" cy="${m2N}" r="6" fill="#999" stroke="#fff" stroke-width="1.5"/><text x="${x2}" y="${m2N-10}" font-size="11" fill="#999" text-anchor="middle" font-weight="700">${mD2}</text>`;
     if(m3N!==null)svg+=`<circle cx="${x3}" cy="${m3N}" r="6" fill="#4a6fa5" stroke="#fff" stroke-width="1.5"/><text x="${x3}" y="${m3N-10}" font-size="11" fill="#4a6fa5" text-anchor="middle" font-weight="700">${mD3}</text>`;
@@ -327,7 +327,7 @@
     const largeChart=makeLargeChart(d.rm2,d.rs2,d.rc2,d.rm3,d.rs3,d.rc3,d.m2,d.s2,d.c2,d.m3,d.s3,d.c3);
     document.getElementById('chartModalBody').innerHTML=largeChart;
     document.getElementById('chartModalStats').innerHTML=
-      `<span style="color:#999">3차: M=${d.m2} (SD=${d.s2}), CVR=${d.c2}</span>&nbsp;&nbsp;│&nbsp;&nbsp;<span style="color:var(--accent)">4차: M=${d.m3} (SD=${d.s3}), CVR=${d.c3}</span>`;
+      `<span style="color:#999">3차: Mdn=${d.m2} (IQR=${d.s2}), CVR=${d.c2}</span>&nbsp;&nbsp;│&nbsp;&nbsp;<span style="color:var(--accent)">4차: Mdn=${d.m3} (IQR=${d.s3}), CVR=${d.c3}</span>`;
     document.getElementById('chartModal').classList.add('active');
   }
   document.getElementById('chartModalClose').addEventListener('click',()=>document.getElementById('chartModal').classList.remove('active'));
@@ -336,7 +336,7 @@
   function navigate(dir){const ni=currentIndex+dir;if(ni<0||ni>=idRows.length)return;currentIndex=ni;renderPage();window.scrollTo({top:0,behavior:'smooth'});}
   document.getElementById('btnPrev').addEventListener('click',()=>navigate(-1));
   document.getElementById('btnNext').addEventListener('click',()=>navigate(1));
-  document.addEventListener('keydown',e=>{if(document.getElementById('opinionModal').classList.contains('active')){if(e.key==='Escape')document.getElementById('opinionModal').classList.remove('active');return;}if(e.key==='ArrowLeft')navigate(-1);if(e.key==='ArrowRight')navigate(1);});
+  document.addEventListener('keydown',e=>{if(document.getElementById('chartModal').classList.contains('active')){if(e.key==='Escape')document.getElementById('chartModal').classList.remove('active');return;}if(document.getElementById('opinionModal').classList.contains('active')){if(e.key==='Escape')document.getElementById('opinionModal').classList.remove('active');return;}if(e.key==='ArrowLeft')navigate(-1);if(e.key==='ArrowRight')navigate(1);});
 
   loadData();
 </script>

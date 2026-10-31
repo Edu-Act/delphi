@@ -187,6 +187,18 @@
     </div>
   </div>
 
+  <!-- 나가기 확인 모달 -->
+  <div class="modal-overlay" id="leaveModal">
+    <div class="modal-box" style="text-align:center;width:480px;padding:28px 32px">
+      <p style="font-size:15px;color:#333;line-height:1.7;margin-bottom:24px">저장되지 않은 변경사항이 있습니다.<br>어떻게 하시겠습니까?</p>
+      <div style="display:flex;gap:10px">
+        <button class="modal-close" id="leaveCancel" style="flex:1;padding:12px">취소</button>
+        <button style="flex:1;padding:12px;font-size:14px;font-weight:600;border-radius:4px;cursor:pointer;background:var(--red);color:#fff;border:none" id="leaveDiscard">저장하지 않고 나가기</button>
+        <button style="flex:1;padding:12px;font-size:14px;font-weight:600;border-radius:4px;cursor:pointer;background:var(--accent);color:#fff;border:none" id="leaveSave">저장 후 나가기</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <div class="header-bar">
@@ -196,7 +208,7 @@
       <button class="btn-hdr" id="btnImport2nd" style="background:var(--orange);color:#fff">📥 2차 결과 불러오기</button>
       <button class="btn-save" id="btnSave">변경사항 저장</button>
       <button class="btn-hdr btn-preview" onclick="window.open('../3rd_delphi_main.html?preview=1&panel=panel_01&panelIndex=1','_blank')">👁 설문 화면 보기</button>
-      <button class="btn-hdr btn-back" onclick="location.href='admin_mng-intro.html'">관리자 메뉴</button>
+      <button class="btn-hdr btn-back" id="btnBack">관리자 메뉴</button>
     </div>
   </div>
 
@@ -283,7 +295,7 @@
       const isPending=!!item._pendingDelete;
       // 2차 결과 매칭 (I-ID 기준)
       const res2=results.find(r=>r['I-ID']===item['I-ID'])||{};
-      const m=res2.mean,s=res2.sd,c=res2.cvr;
+      const m=res2.median,s=res2.IQR,c=res2.cvr;
       const mN=(m!==''&&m!==null&&m!=='Ready')?Number(m):null;
       const sN=(s!==''&&s!==null&&s!=='Ready')?Number(s):null;
       const mDisp=fmtStat(m),sDisp=fmtStat(s),cDisp=fmtStat(c);
@@ -294,7 +306,7 @@
         const meanPos=(mN-1)/3*100;
         const sVal=sN!==null&&!isNaN(sN)?sN:0;
         const sdL=Math.max(0,(mN-sVal-1)/3*100),sdR=Math.min(100,(mN+sVal-1)/3*100),sdW=Math.max(0,sdR-sdL);
-        barHtml+=`<div class="prev-bar-area"><div class="prev-mean-group" style="left:${meanPos}%"><div class="prev-mean-label">M=${mDisp} (SD=${sDisp})</div><div class="prev-mean-arrow">▼</div></div><div class="prev-bar-track"><div class="prev-bar-dotline"></div><div class="prev-bar-sd" style="left:${sdL}%;width:${sdW}%"></div></div></div>`;
+        barHtml+=`<div class="prev-bar-area"><div class="prev-mean-group" style="left:${meanPos}%"><div class="prev-mean-label">Mdn=${mDisp} (IQR=${sDisp})</div><div class="prev-mean-arrow">▼</div></div><div class="prev-bar-track"><div class="prev-bar-dotline"></div><div class="prev-bar-sd" style="left:${sdL}%;width:${sdW}%"></div></div></div>`;
       }else{barHtml+='<div class="prev-bar-area" style="display:flex;align-items:center;justify-content:center"><span style="font-size:12px;color:#bbb">Ready</span></div>';}
 
       // 버튼
@@ -547,6 +559,49 @@
     }finally{btn.disabled=false;}
   }
 
+  /* ═══════════ 나가기 확인 (미저장 변경사항) ═══════════ */
+  let pendingAction=null;
+
+  function hasChanges(){
+    if(deletedIndexRows.length>0) return true;
+    for(const type of ['edu','hahwa','sanggu']){
+      const cur=type==='edu'?eduRows:type==='hahwa'?hahwaRows:sangguRows;
+      const orig=type==='edu'?origEduRows:type==='hahwa'?origHahwaRows:origSangguRows;
+      if(cur.length!==orig.length) return true;
+      for(let i=0;i<cur.length;i++){
+        if(cur[i]._isNew||cur[i]._pendingDelete) return true;
+        if(cur[i].index!==orig[i].index) return true;
+      }
+    }
+    return false;
+  }
+
+  function executePendingAction(){
+    if(!pendingAction) return;
+    if(pendingAction.type==='leave'){
+      if(pendingAction.target==='back') location.href='admin_mng-intro.html';
+      else if(pendingAction.target==='logout') location.href='admin_login.html';
+    } else if(pendingAction.type==='nav'){
+      const ni=currentIndex+pendingAction.dir;
+      if(ni>=0&&ni<idRows.length){currentIndex=ni;renderPage();window.scrollTo({top:0,behavior:'smooth'});}
+    }
+    pendingAction=null;
+  }
+
+  document.getElementById('btnBack').addEventListener('click',()=>{
+    if(hasChanges()){pendingAction={type:'leave',target:'back'};document.getElementById('leaveModal').classList.add('active');}
+    else location.href='admin_mng-intro.html';
+  });
+
+  document.getElementById('leaveCancel').addEventListener('click',()=>{pendingAction=null;document.getElementById('leaveModal').classList.remove('active');});
+  document.getElementById('leaveDiscard').addEventListener('click',()=>{document.getElementById('leaveModal').classList.remove('active');executePendingAction();});
+  document.getElementById('leaveSave').addEventListener('click',async()=>{
+    document.getElementById('leaveModal').classList.remove('active');
+    await doSave();
+    const poll=setInterval(()=>{if(!document.getElementById('progressFloat').classList.contains('active')){clearInterval(poll);executePendingAction();}},300);
+  });
+  document.getElementById('leaveModal').addEventListener('click',e=>{if(e.target.id==='leaveModal'){pendingAction=null;e.target.classList.remove('active');}});
+
   /* ═══════════ 저장/삭제 확인 모달 이벤트 ═══════════ */
   document.getElementById('saveConfirmOk').addEventListener('click',doSave);
   document.getElementById('saveConfirmCancel').addEventListener('click',()=>document.getElementById('saveConfirmModal').classList.remove('active'));
@@ -559,7 +614,7 @@
   function navigate(dir){const ni=currentIndex+dir;if(ni<0||ni>=idRows.length)return;currentIndex=ni;renderPage();window.scrollTo({top:0,behavior:'smooth'});}
   document.getElementById('btnPrev').addEventListener('click',()=>navigate(-1));
   document.getElementById('btnNext').addEventListener('click',()=>navigate(1));
-  document.addEventListener('keydown',e=>{if(document.getElementById('opinionModal').classList.contains('active')||document.getElementById('progressFloat').classList.contains('active')||document.getElementById('saveConfirmModal').classList.contains('active')||document.getElementById('deleteConfirmModal').classList.contains('active')||document.getElementById('importConfirmModal').classList.contains('active')){if(e.key==='Escape'){document.getElementById('opinionModal').classList.remove('active');document.getElementById('progressFloat').classList.remove('active');document.getElementById('saveConfirmModal').classList.remove('active');document.getElementById('deleteConfirmModal').classList.remove('active');document.getElementById('importConfirmModal').classList.remove('active');}return;}if(e.key==='ArrowLeft')navigate(-1);if(e.key==='ArrowRight')navigate(1);});
+  document.addEventListener('keydown',e=>{if(document.getElementById('opinionModal').classList.contains('active')||document.getElementById('progressFloat').classList.contains('active')||document.getElementById('saveConfirmModal').classList.contains('active')||document.getElementById('deleteConfirmModal').classList.contains('active')||document.getElementById('importConfirmModal').classList.contains('active')||document.getElementById('leaveModal').classList.contains('active')){if(e.key==='Escape'){document.getElementById('opinionModal').classList.remove('active');document.getElementById('progressFloat').classList.remove('active');document.getElementById('saveConfirmModal').classList.remove('active');document.getElementById('deleteConfirmModal').classList.remove('active');document.getElementById('importConfirmModal').classList.remove('active');document.getElementById('leaveModal').classList.remove('active');pendingAction=null;}return;}if(e.key==='ArrowLeft')navigate(-1);if(e.key==='ArrowRight')navigate(1);});
 
   loadData();
 </script>

@@ -210,6 +210,17 @@
     </div>
   </div>
 
+  <!-- 행 삭제 확인 모달 -->
+  <div class="modal-overlay" id="delRowModal">
+    <div class="modal-box confirm-box">
+      <p>현재 항목(<strong id="delRowIdLabel"></strong>)을 정말 삭제하시겠습니까?<br>삭제된 항목은 복구할 수 없습니다.</p>
+      <div class="modal-actions" style="gap:8px">
+        <button class="modal-cancel" id="delRowCancel">취소</button>
+        <button class="modal-confirm" id="delRowConfirm" style="background:var(--red)">삭제</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 행 추가 모달 -->
   <div class="modal-overlay" id="addRowModal">
     <div class="modal-box">
@@ -237,6 +248,7 @@
     <div class="header-right">
       <span style="font-size:13px;color:var(--ink-soft);margin-right:6px" id="topEmail"></span>
       <button class="btn-hdr btn-add-row" id="btnAddRow">＋ 새 항목 추가</button>
+      <button class="btn-hdr btn-del-row" id="btnDelRow">✕ 현재 항목 삭제</button>
       <button class="btn-save" id="btnSave">변경사항 저장</button>
       <button class="btn-hdr btn-preview" id="btnPreview">👁 설문 화면 보기</button>
       <button class="btn-hdr btn-back" id="btnBack">관리자 메뉴로 가기</button>
@@ -614,6 +626,40 @@
     }
   });
 
+  /* ════════════════════ 행 삭제 ════════════════════ */
+  const delRowModal = document.getElementById('delRowModal');
+  document.getElementById('btnDelRow').addEventListener('click', () => {
+    if (!allRows.length) { showToast('삭제할 항목이 없습니다.'); return; }
+    document.getElementById('delRowIdLabel').textContent = allRows[currentIndex].ID || '';
+    delRowModal.classList.add('active');
+  });
+  document.getElementById('delRowCancel').addEventListener('click', () => delRowModal.classList.remove('active'));
+  delRowModal.addEventListener('click', e => { if (e.target === delRowModal) delRowModal.classList.remove('active'); });
+
+  document.getElementById('delRowConfirm').addEventListener('click', async () => {
+    const btn = document.getElementById('delRowConfirm');
+    btn.disabled = true; btn.textContent = '삭제 중…';
+    try {
+      const id = allRows[currentIndex].ID;
+      const res = await gasCall({ action:'deleteRow', ID: id });
+      if (res.status !== 'ok') throw new Error(res.message || '삭제 실패');
+      delRowModal.classList.remove('active');
+      allRows.splice(currentIndex, 1);
+      if (currentIndex >= allRows.length) currentIndex = Math.max(0, allRows.length - 1);
+      if (allRows.length === 0) {
+        showToast('모든 항목이 삭제되었습니다.', 3000);
+        document.querySelector('.cards-container').innerHTML = '<div style="text-align:center;padding:40px;color:#999">데이터가 없습니다.</div>';
+      } else {
+        renderPage();
+        showToast('항목이 삭제되었습니다.');
+      }
+    } catch(e) {
+      showToast('삭제 오류: ' + e.message, 4000);
+    } finally {
+      btn.disabled = false; btn.textContent = '삭제';
+    }
+  });
+
   /* ════════════════════ 변경사항 감지 ════════════════════ */
   let savedSnapshot = '';
 
@@ -636,14 +682,14 @@
 
   /* ════════════════════ 나가기 확인 모달 ════════════════════ */
   const leaveModal = document.getElementById('leaveModal');
-  let leaveTarget = ''; // 'back' or 'logout'
+  let pendingAction = null; // { type:'leave', target:'back'|'logout' } or { type:'nav', dir:1|-1 }
 
   function requestLeave(target) {
     if (!hasChanges()) {
       doLeave(target);
       return;
     }
-    leaveTarget = target;
+    pendingAction = { type:'leave', target };
     leaveModal.classList.add('active');
   }
 
@@ -657,11 +703,25 @@
     }
   }
 
+  function executePendingAction() {
+    leaveModal.classList.remove('active');
+    if (!pendingAction) return;
+    if (pendingAction.type === 'leave') {
+      doLeave(pendingAction.target);
+    } else {
+      currentIndex += pendingAction.dir;
+      renderPage();
+      window.scrollTo({ top:0, behavior:'smooth' });
+    }
+    pendingAction = null;
+  }
+
   document.getElementById('leaveCancel').addEventListener('click', () => {
     leaveModal.classList.remove('active');
+    pendingAction = null;
   });
   document.getElementById('leaveDiscard').addEventListener('click', () => {
-    doLeave(leaveTarget);
+    executePendingAction();
   });
   document.getElementById('leaveSave').addEventListener('click', async () => {
     const btn = document.getElementById('leaveSave');
@@ -671,7 +731,8 @@
       const res = await gasCall({ action:'updateRow', rowData: data });
       if (res.status !== 'ok') throw new Error(res.message || '저장 실패');
       Object.assign(allRows[currentIndex], data);
-      doLeave(leaveTarget);
+      savedSnapshot = takeSnapshot();
+      executePendingAction();
     } catch(e) {
       showToast('저장 오류: ' + e.message, 4000);
       leaveModal.classList.remove('active');
@@ -701,6 +762,11 @@
   function navigate(dir) {
     const ni = currentIndex + dir;
     if (ni < 0 || ni >= allRows.length) return;
+    if (hasChanges()) {
+      pendingAction = { type:'nav', dir };
+      leaveModal.classList.add('active');
+      return;
+    }
     currentIndex = ni;
     renderPage();
     window.scrollTo({ top:0, behavior:'smooth' });
@@ -711,8 +777,8 @@
   document.addEventListener('keydown', e => {
     const saveModal = document.getElementById('saveConfirmModal');
     const delModal = document.getElementById('deleteConfirmModal');
-    if (descEditModal.classList.contains('active') || addRowModal.classList.contains('active') || leaveModal.classList.contains('active') || saveModal.classList.contains('active') || delModal.classList.contains('active')) {
-      if (e.key === 'Escape') { closeDescEdit(); addRowModal.classList.remove('active'); leaveModal.classList.remove('active'); saveModal.classList.remove('active'); delModal.classList.remove('active'); }
+    if (descEditModal.classList.contains('active') || addRowModal.classList.contains('active') || leaveModal.classList.contains('active') || saveModal.classList.contains('active') || delModal.classList.contains('active') || delRowModal.classList.contains('active')) {
+      if (e.key === 'Escape') { closeDescEdit(); addRowModal.classList.remove('active'); leaveModal.classList.remove('active'); saveModal.classList.remove('active'); delModal.classList.remove('active'); delRowModal.classList.remove('active'); }
       return;
     }
     if (e.key === 'ArrowLeft')  navigate(-1);
