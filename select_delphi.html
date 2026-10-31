@@ -15,7 +15,7 @@
       background-color: #f0f0f0;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      min-height: 100vh; padding: 40px 20px;
+      min-height: 100vh; padding: 0 20px;
     }
 
     /* 상단 바 */
@@ -50,28 +50,29 @@
     .pw-modal{background:#fff;border-radius:6px;width:540px;max-width:96vw;max-height:90vh;position:relative;box-shadow:0 8px 32px rgba(0,0,0,.18);overflow:hidden}
     .pw-modal-close{position:absolute;top:10px;right:14px;font-size:22px;color:#999;cursor:pointer;background:none;border:none;line-height:1;z-index:10;transition:color .15s}
     .pw-modal-close:hover{color:#333}
-    .pw-modal iframe{width:100%;height:700px;border:none}
+    .pw-modal iframe{width:100%;height:580px;border:none}
 
     /* 카드 */
     .card {
       background: #fff; border-radius: 8px;
       width: 100%; max-width: 640px;
-      padding: 40px 40px 36px;
+      padding: 28px 36px 24px;
       box-shadow: 0 4px 24px rgba(0,0,0,.10);
     }
     .card-title {
       font-size: 18px; font-weight: bold; color: #111;
-      margin-bottom: 32px; text-align: center;
+      margin-bottom: 20px; text-align: center;
     }
 
     /* 설문 목록 */
-    .delphi-list { display: flex; flex-direction: column; gap: 16px; }
+    .delphi-list { display: flex; flex-direction: column; gap: 14px; }
 
     .delphi-item {
       display: flex; align-items: center;
       border: 1px solid #ddd; border-radius: 6px;
-      padding: 18px 22px; background: #fafafa;
+      padding: 0 20px; background: #fafafa;
       transition: background .15s;
+      height: 60px;
     }
     .delphi-item:hover { background: #f0f4ff; }
 
@@ -94,24 +95,55 @@
     }
     .ps-waiting    { background: #e8edf5; color: #4a6fa5; }
     .ps-proceeding { background: #d4edda; color: #1a7a3c; }
-    .ps-done       { background: #333; color: #fff; }
+    .ps-done       { background: #e0e0e0; color: #222; }
 
     /* 진입 버튼 */
     .btn-enter {
-      padding: 8px 20px; font-size: 14px; font-weight: bold;
+      padding: 8px 20px; font-size: 13px; font-weight: bold;
       border-radius: 4px; cursor: pointer; white-space: nowrap;
-      transition: opacity .2s;
+      transition: opacity .2s; min-width: 97px; text-align: center;
     }
     .btn-enter:hover { opacity: .85; }
-    .btn-enter.active-btn  { background: #1e1e1e; border: none; color: #fff; }
+    .btn-enter.active-btn  { background: #4a6fa5; border: none; color: #fff; }
     .btn-enter.edit-btn    { background: #4a6fa5; border: none; color: #fff; }
     .btn-enter.done-btn    { background: #555; border: none; color: #ddd; cursor: default; }
     .btn-enter.disabled-btn{ background: #eee; border: 1px solid #ccc; color: #aaa; cursor: default; }
+    .btn-enter.loading-btn {
+      background: #4a6fa5; border: none; color: #fff;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: default; opacity: .85;
+    }
 
     /* 로딩 */
     .loading { text-align: center; color: #aaa; font-size: 14px; padding: 40px 0; display:flex; flex-direction:column; align-items:center; gap:16px; }
     .spinner { width:32px; height:32px; border:3px solid #e0e0e0; border-top:3px solid #4a6fa5; border-radius:50%; animation:spin .8s linear infinite; }
     @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* 인라인 로딩 스피너 (버튼 자리 — btn-enter와 동일 크기) */
+    .btn-loading {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 8px 20px; font-size: 13px; font-weight: bold; color: #aaa;
+      white-space: nowrap; min-width: 97px;
+    }
+    .spinner-sm {
+      width: 16px; height: 16px;
+      border: 2px solid #e0e0e0; border-top: 2px solid #4a6fa5;
+      border-radius: 50%; animation: spin .8s linear infinite;
+    }
+
+    /* 항목별 진행바 (섹션 전체를 진행바로 활용) */
+    .delphi-item { position: relative; overflow: hidden; }
+    .delphi-item > * { position: relative; z-index: 1; }
+    .item-progress {
+      position: absolute; top: 0; left: 0; height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, rgba(74,111,165,0.13), rgba(90,154,110,0.13));
+      transition: width 0.4s ease;
+      z-index: 0 !important;
+    }
+    .item-progress.done {
+      background: rgba(90,154,110,0.15);
+    }
 
     /* 로그아웃 확인 모달 */
     .overlay {
@@ -178,7 +210,11 @@
   <div class="card">
     <p class="card-title">델파이 설문 선택</p>
     <div class="delphi-list" id="delphiList">
-      <div class="loading" id="loadingArea"><div class="spinner"></div><span>설문 정보를 불러오는 중...</span></div>
+      <div class="delphi-item" id="item-1st_delphi"><span class="delphi-label">1차 델파이 설문</span><span id="status-1st_delphi"></span><span class="btn-loading" id="btn-1st_delphi"><span class="spinner-sm"></span>로딩 중</span><div class="item-progress" id="prog-1st_delphi"></div></div>
+      <div class="delphi-item" id="item-2nd_delphi"><span class="delphi-label">2차 델파이 설문</span><span id="status-2nd_delphi"></span><span class="btn-loading" id="btn-2nd_delphi"><span class="spinner-sm"></span>로딩 중</span><div class="item-progress" id="prog-2nd_delphi"></div></div>
+      <div class="delphi-item" id="item-3rd_delphi"><span class="delphi-label">3차 델파이 설문</span><span id="status-3rd_delphi"></span><span class="btn-loading" id="btn-3rd_delphi"><span class="spinner-sm"></span>로딩 중</span><div class="item-progress" id="prog-3rd_delphi"></div></div>
+      <div class="delphi-item" id="item-4th_delphi"><span class="delphi-label">4차 델파이 설문</span><span id="status-4th_delphi"></span><span class="btn-loading" id="btn-4th_delphi"><span class="spinner-sm"></span>로딩 중</span><div class="item-progress" id="prog-4th_delphi"></div></div>
+      <div class="delphi-item" id="item-5th_delphi"><span class="delphi-label">5차 델파이 설문(지표별 가중치 설정)</span><span id="status-5th_delphi"></span><span class="btn-loading" id="btn-5th_delphi"><span class="spinner-sm"></span>로딩 중</span><div class="item-progress" id="prog-5th_delphi"></div></div>
     </div>
   </div>
 
@@ -266,7 +302,7 @@
     const v = (val || '').trim();
     if (!v || v === '대기') return '<span class="panel-status ps-waiting">대기</span>';
     if (v === '진행중')     return '<span class="panel-status ps-proceeding">진행중</span>';
-    if (v.startsWith('완료')) return `<span class="panel-status ps-done">${v}</span>`;
+    if (v.startsWith('완료')) return '<span class="panel-status ps-done">완료</span>';
     return `<span class="panel-status ps-proceeding">${v}</span>`;
   }
 
@@ -294,133 +330,246 @@
 
   /* 날짜 → 간단 형식 (2025.08.24.) */
 
-  /* 설문 목록 렌더링 — GAS 직접 호출 (CSV 캐싱 문제 완전 해결) */
-  async function loadDelphi() {
+  /* 스켈레톤(로딩 중 초기 레이아웃) 렌더링 */
+  function renderSkeleton() {
     const list = document.getElementById('delphiList');
-    list.innerHTML = '<div class="loading"><div class="spinner"></div><span>설문 정보를 불러오는 중...</span></div>';
+    list.innerHTML = ROUND_INFO.map(info => `
+      <div class="delphi-item" id="item-${info.key}">
+        <span class="delphi-label">${info.label}</span>
+        <span id="status-${info.key}"></span>
+        <span class="btn-loading" id="btn-${info.key}"><span class="spinner-sm"></span>로딩 중</span>
+        <div class="item-progress" id="prog-${info.key}"></div>
+      </div>`).join('');
+  }
+
+  /* 진행바 — 개별 항목 진행률 업데이트 */
+  const itemTimers = {};
+  function setItemProgress(key, pct) {
+    const bar = document.getElementById('prog-' + key);
+    if (bar) bar.style.width = Math.min(100, pct) + '%';
+  }
+  /* 개별 항목 슬로우 필 애니메이션 */
+  function startItemSlowFill(key, targetPct, durationMs) {
+    stopItemAnimation(key);
+    const bar = document.getElementById('prog-' + key);
+    if (!bar) return;
+    const startPct = parseFloat(bar.style.width) || 0;
+    const startTime = Date.now();
+    function tick() {
+      const elapsed = Date.now() - startTime;
+      const ratio = Math.min(1, elapsed / durationMs);
+      const eased = ratio * (2 - ratio); // ease-out
+      bar.style.width = (startPct + eased * (targetPct - startPct)) + '%';
+      if (ratio < 1) itemTimers[key] = requestAnimationFrame(tick);
+    }
+    tick();
+  }
+  function stopItemAnimation(key) {
+    if (itemTimers[key]) { cancelAnimationFrame(itemTimers[key]); delete itemTimers[key]; }
+  }
+
+  /* 개별 항목 상태·버튼 업데이트 */
+  function updateItem(info, myStatus, check) {
+    const statusEl = document.getElementById('status-' + info.key);
+    const btnEl    = document.getElementById('btn-' + info.key);
+    if (statusEl) statusEl.outerHTML = panelStatusHtml(myStatus);
+    if (btnEl)    btnEl.outerHTML = enterBtn(myStatus, check, info.page, info.label);
+  }
+
+  /* ════════════════════════════════
+     설문 데이터 백그라운드 프리페치 설정
+     — main 페이지와 동일한 API·캐시 키·데이터 형식 사용
+  ════════════════════════════════ */
+  const PANEL_GAS_URL = 'https://script.google.com/macros/s/AKfycbyANEwW2VP3voGUhuOqoznH98IgfkzUOXv9G3S92UGawsgih9hp2Btbv57sU-ZSniyJIA/exec';
+
+  const SURVEY_PREFETCH = {
+    '1st_delphi': {
+      gasUrl: 'https://script.google.com/macros/s/AKfycbx_2YnwVqMGOYnVIvEOxv1m_40JXpmWW3umPzirMaEzTfCo8Z6tcOZqkCw_WPOPObo/exec',
+      cachePrefix: '1st_delphi_cache_v2_',
+      cacheTimePrefix: '1st_delphi_cache_time_v2_'
+    },
+    '2nd_delphi': {
+      gasUrl: 'https://script.google.com/macros/s/AKfycby8T2g35wad3QhAT4quWjip-Huo8rrpsNOHgvqIJiv_oLLbrA6MJdmn2KUTinMT_ZA13g/exec',
+      cachePrefix: '2nd_delphi_cache_v2_',
+      cacheTimePrefix: '2nd_delphi_cache_time_v2_'
+    },
+    '3rd_delphi': {
+      gasUrl: 'https://script.google.com/macros/s/AKfycbyy2U_D95cGtZUPX7pq6gLvb4o66VjVGw34qssYWqNrCcjbSRJ0yu9df9JRjberqR8s/exec',
+      cachePrefix: '3rd_delphi_cache_v2_',
+      cacheTimePrefix: '3rd_delphi_cache_time_v2_'
+    },
+    '4th_delphi': {
+      gasUrl: 'https://script.google.com/macros/s/AKfycbwwGfqGvxNrc_PsexgzN5bNhMHb45nNpEbIuMLxVMskShoogpJON9oh_CGZf8kkQbJqxA/exec',
+      cachePrefix: '4th_delphi_cache_v2_',
+      cacheTimePrefix: '4th_delphi_cache_time_v2_'
+    },
+    '5th_delphi': {
+      gasUrl: 'https://script.google.com/macros/s/AKfycbwxjloBqWVKvZizbd-3I89nrPSfzhpVZIY2wdQ-dDfiGo-yhytfcO1vhtWjrWs67ODHkg/exec',
+      cachePrefix: '5th_delphi_cache_v2_',
+      cacheTimePrefix: '5th_delphi_cache_time_v2_'
+    }
+  };
+
+  const PREFETCH_CACHE_TTL = 5 * 60 * 1000;
+
+  /* 설문 목록 렌더링 — 진행중만 프리페치, 나머지는 즉시 표시 */
+  async function loadDelphi() {
+    renderSkeleton();
 
     try {
-      /* sessionStorage 캐시 (3분) — forceRefresh 시 캐시 무시 */
+      /* ── Phase 1: 설문 상태 조회 ── */
       const cacheKey = 'select_delphi_cache';
       const cacheTimeKey = 'select_delphi_cache_time';
       const cached = sessionStorage.getItem(cacheKey);
       const cachedTime = parseInt(sessionStorage.getItem(cacheTimeKey) || '0', 10);
       const CACHE_TTL = 3 * 60 * 1000;
 
-      let delphiData, panelRows, myPanel;
+      let delphiData, myPanel;
 
       if (!forceRefresh && cached && (Date.now() - cachedTime < CACHE_TTL)) {
         const c = JSON.parse(cached);
         delphiData = c.delphiData;
         myPanel = c.myPanel;
       } else {
-        /* GAS 직접 호출 — 시트 데이터를 실시간으로 가져옴 (CSV 캐시 지연 없음) */
         const [delphiResult, panelResult] = await Promise.all([
           gasCall({ action: 'listDelphiNo' }),
           gasCall({ action: 'listPanels' })
         ]);
-
         if (delphiResult.status !== 'ok') throw new Error(delphiResult.message || '델파이 상태 로드 실패');
         if (panelResult.status !== 'ok')  throw new Error(panelResult.message || '패널 데이터 로드 실패');
-
-        delphiData = delphiResult.data;  // [{Delphi_no, check, save_date}]
-        panelRows  = panelResult.data;   // [{panel_no, 'e-mail', ...status keys..., etc}]
-
-        /* 현재 패널 찾기 */
-        myPanel = panelRows.find(r =>
+        delphiData = delphiResult.data;
+        myPanel = panelResult.data.find(r =>
           (r['e-mail'] || '').trim().toLowerCase() === panelEmail.trim().toLowerCase()
         ) || {};
-
-        /* 캐시 저장 */
         sessionStorage.setItem(cacheKey, JSON.stringify({ delphiData, myPanel }));
         sessionStorage.setItem(cacheTimeKey, String(Date.now()));
-        forceRefresh = false;  // 플래그 리셋
+        forceRefresh = false;
       }
 
       const map = {};
       delphiData.forEach(r => { map[r['Delphi_no']] = r['check'] || '대기'; });
-
-      /* 패널 상태를 sessionStorage에 저장 (설문 페이지에서 GAS 재호출 없이 활용) */
       sessionStorage.setItem('panelStatusData', JSON.stringify(myPanel));
 
-      list.innerHTML = ROUND_INFO.map(info => {
+      /* ── Phase 2: 항목별 즉시 표시 ── */
+      ROUND_INFO.forEach(info => {
         const check = map[info.key] || '대기';
         const myStatus = myPanel[info.statusKey] || '대기';
-        return `
-          <div class="delphi-item">
-            <span class="delphi-label">${info.label}</span>
-            ${panelStatusHtml(myStatus)}
-            ${enterBtn(myStatus, check, info.page, info.label)}
-          </div>`;
-      }).join('');
 
-      /* ── 진행중인 설문 데이터를 백그라운드 프리페치 ── */
-      prefetchSurveyData(map, myPanel);
-    } catch(e) {
-      list.innerHTML = `<div class="loading"><span>로드 실패: ${e.message}</span></div>`;
-    }
-  }
-
-  /* ════════════════════════════════
-     설문 데이터 백그라운드 프리페치
-     — 사용자가 설문 페이지로 이동하기 전에 데이터를 미리 다운로드
-  ════════════════════════════════ */
-  const SURVEY_PREFETCH = {
-    '1st_delphi': {
-      gasUrl: 'https://script.google.com/macros/s/AKfycbx_2YnwVqMGOYnVIvEOxv1m_40JXpmWW3umPzirMaEzTfCo8Z6tcOZqkCw_WPOPObo/exec',
-      cacheKey: '1st_delphi_cache_v3',
-      cacheTimeKey: '1st_delphi_cache_v3_time',
-      statusKey: '1st_delphi_status'
-    }
-    // 2nd~5th 라운드 GAS URL이 확정되면 여기에 추가
-    // '2nd_delphi': { gasUrl: '...', cacheKey: '2nd_delphi_cache_v3', ... }
-  };
-
-  const PREFETCH_CACHE_TTL = 30 * 60 * 1000; // 30분
-
-  async function prefetchSurveyData(delphiMap, myPanel) {
-    const panelNo = sessionStorage.getItem('panelNo') || '';
-
-    for (const [key, config] of Object.entries(SURVEY_PREFETCH)) {
-      try {
-        const check = (delphiMap[key] || '').trim();
-        // 설문이 '진행중'인 경우만 프리페치
-        if (check !== '진행중') continue;
-
-        // 이미 유효한 캐시가 있으면 스킵
-        const cached = sessionStorage.getItem(config.cacheKey);
-        const cachedTime = parseInt(sessionStorage.getItem(config.cacheTimeKey) || '0', 10);
-        if (cached && (Date.now() - cachedTime < PREFETCH_CACHE_TTL)) {
-          console.log('[prefetch] ' + key + ' — 캐시 유효, 스킵');
-          continue;
+        if (check === '진행중') {
+          /* 진행중: 상태 뱃지 즉시 표시 + 버튼 로딩 + 진행바 동시 시작 */
+          const statusEl = document.getElementById('status-' + info.key);
+          if (statusEl) statusEl.outerHTML = panelStatusHtml(myStatus);
+          const btnEl = document.getElementById('btn-' + info.key);
+          if (btnEl) {
+            btnEl.outerHTML = `<button class="btn-enter loading-btn" id="btn-${info.key}" disabled>로딩중...</button>`;
+          }
+          startItemSlowFill(info.key, 50, 3000);
+        } else {
+          /* 완료·대기: 즉시 최종 상태 표시 */
+          updateItem(info, myStatus, check);
+          const bar = document.getElementById('prog-' + info.key);
+          if (bar) bar.style.display = 'none';
         }
+      });
 
-        console.log('[prefetch] ' + key + ' — 백그라운드 프리페치 시작...');
-        const [dataRes, addRes] = await Promise.all([
-          fetch(config.gasUrl, {
+      /* ── Phase 3: 진행중 항목 순차 프리페치 + 진행바 애니메이션 ── */
+      const activeRounds = ROUND_INFO.filter(info => (map[info.key] || '') === '진행중');
+
+      if (activeRounds.length > 0) {
+        /* 패널 정보 조회 (프리페치용) */
+        let panelCol = '', panelIdx = 0;
+        try {
+          const pRes = await fetch(PANEL_GAS_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify({ action: 'getData' })
-          }).then(r => r.text()).then(t => { try { return JSON.parse(t); } catch { return { status:'error' }; } }),
-          fetch(config.gasUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify({ action: 'getAdditions', panel: panelNo || panelEmail })
-          }).then(r => r.text()).then(t => { try { return JSON.parse(t); } catch { return { status:'error' }; } })
-        ]);
-
-        if (dataRes && dataRes.status === 'ok' && Array.isArray(dataRes.rows) && dataRes.rows.length > 0) {
-          sessionStorage.setItem(config.cacheKey, JSON.stringify({ dataRes, addRes }));
-          sessionStorage.setItem(config.cacheTimeKey, String(Date.now()));
-          console.log('[prefetch] ' + key + ' — 프리페치 완료 (' + dataRes.rows.length + '건)');
+            body: JSON.stringify({ action: 'getPanelByEmail', email: panelEmail })
+          });
+          const pData = JSON.parse(await pRes.text());
+          if (pData.status === 'ok' && pData.panelCol) {
+            panelCol = pData.panelCol;
+            panelIdx = pData.panelIndex || 0;
+          }
+        } catch(e) {
+          console.log('[prefetch] 패널 조회 실패:', e.message);
         }
-      } catch(e) {
-        console.log('[prefetch] ' + key + ' — 프리페치 실패 (무시):', e.message);
+
+        /* 각 진행중 라운드 순차 처리 */
+        for (const info of activeRounds) {
+          const config = SURVEY_PREFETCH[info.key];
+          if (!config) {
+            updateItem(info, myPanel[info.statusKey] || '대기', '진행중');
+            continue;
+          }
+
+          try {
+            const ck = config.cachePrefix + panelEmail;
+            const ctk = config.cacheTimePrefix + panelEmail;
+            const cch = sessionStorage.getItem(ck);
+            const cchTime = parseInt(sessionStorage.getItem(ctk) || '0', 10);
+
+            if (cch && (Date.now() - cchTime < PREFETCH_CACHE_TTL)) {
+              /* 캐시 히트 → 바로 완료 */
+              console.log('[prefetch] ' + info.key + ' — 캐시 유효');
+              stopItemAnimation(info.key);
+              setItemProgress(info.key, 100);
+            } else {
+              /* 1) 설문 데이터 */
+              console.log('[prefetch] ' + info.key + ' — 프리페치 시작...');
+              const dataRes = await fetch(config.gasUrl + '?action=getAllData');
+              const surveyData = JSON.parse(await dataRes.text());
+              stopItemAnimation(info.key);
+              setItemProgress(info.key, 70);
+
+              if (surveyData && surveyData.status === 'ok') {
+                /* 2) 저장된 평정값 */
+                let savedRatingsData = { savedRatings: {} };
+                if (panelCol && panelIdx > 0) {
+                  try {
+                    const srUrl = config.gasUrl + '?action=getSavedRatings&panelCol=' + encodeURIComponent(panelCol) + '&panelIndex=' + panelIdx;
+                    savedRatingsData = JSON.parse(await (await fetch(srUrl)).text());
+                  } catch(e) {}
+                }
+                sessionStorage.setItem(ck, JSON.stringify({ panelCol, panelIdx, surveyData, savedRatingsData }));
+                sessionStorage.setItem(ctk, String(Date.now()));
+                console.log('[prefetch] ' + info.key + ' — 프리페치 완료');
+              }
+              setItemProgress(info.key, 100);
+            }
+          } catch(e) {
+            console.log('[prefetch] ' + info.key + ' — 실패:', e.message);
+            stopItemAnimation(info.key);
+            setItemProgress(info.key, 100);
+          }
+
+          /* 진행바 완료 표시 + 상태·버튼 업데이트 */
+          const bar = document.getElementById('prog-' + info.key);
+          if (bar) bar.classList.add('done');
+          updateItem(info, myPanel[info.statusKey] || '대기', '진행중');
+
+          /* 잠시 후 진행바 페이드아웃 */
+          await new Promise(r => setTimeout(r, 300));
+          if (bar) { bar.style.transition = 'opacity 0.5s'; bar.style.opacity = '0'; }
+        }
       }
+    } catch(e) {
+      ROUND_INFO.forEach(info => {
+        const btnEl = document.getElementById('btn-' + info.key);
+        if (btnEl) btnEl.outerHTML = '<span class="btn-loading" style="color:#e74c3c">로드 실패</span>';
+      });
     }
   }
 
   loadDelphi();
+
+  /* 브라우저 뒤로가기(bfcache) 복원 시 스켈레톤부터 다시 로드 */
+  window.addEventListener('pageshow', e => {
+    if (e.persisted) {
+      forceRefresh = true;
+      sessionStorage.removeItem('select_delphi_cache');
+      sessionStorage.removeItem('select_delphi_cache_time');
+      loadDelphi();
+    }
+  });
 
   /* P/W 변경 모달 */
   const pwOverlay = document.getElementById('pwOverlay');
@@ -433,11 +582,11 @@
     pwOverlay.classList.remove('active'); pwIframe.src = '';
   });
   pwOverlay.addEventListener('click', e => {
-    if (e.target === pwOverlay) { pwOverlay.classList.remove('active'); pwIframe.src = ''; }
+    if (e.target === pwOverlay) { /* 배경 클릭 시 닫지 않음 */ }
   });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && pwOverlay.classList.contains('active')) {
-      pwOverlay.classList.remove('active'); pwIframe.src = '';
+      /* 비밀번호 변경 모달은 Escape로 닫지 않음 */
     }
   });
   window.addEventListener('message', e => {

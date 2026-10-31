@@ -505,7 +505,7 @@
 
     <div class="notice-box">
       <strong>💡 설문 요약</strong><br>
-      4차 설문은 3차 설문 결과를 참고하여 평정지표의 <strong>적절성</strong>을 다시 4점 척도(1 매우 부적절 ~ 4 매우 적절)로 평정하는 설문입니다. 각 지표마다 <strong>3차 델파이 결과</strong>(평균, 표준편차, CVR, 본인의 이전 선택, 부적절 의견)가 함께 제시되므로, 이를 참고하여 4차 평정을 진행합니다.
+      4차 설문은 3차 설문 결과를 참고하여 평정지표의 <strong>적절성</strong>을 다시 4점 척도(1 매우 부적절 ~ 4 매우 적절)로 평정하는 설문입니다. 각 지표마다 <strong>3차 델파이 결과</strong>(중앙값, 사분위범위, CVR, 본인의 이전 선택, 부적절 의견)가 함께 제시되므로, 이를 참고하여 4차 평정을 진행합니다.
     </div>
 
     <hr class="divider" />
@@ -564,17 +564,17 @@
         <p>각 지표의 중간 칼럼에 <strong>3차 델파이 결과</strong>가 시각적으로 표시됩니다. 이를 참고하여 4차 평정을 진행합니다.</p>
       </div>
 
-      <!-- 3차 결과 미리보기: M=3.0, SD=1.2, CVR=.64, 이전 선택=4 -->
+      <!-- 3차 결과 미리보기: Mdn=3.0, Q1=2.0, Q3=3.5, IQR=1.50, CVR=.64, 이전 선택=4 -->
       <div class="prev-demo">
         <div>
           <div class="prev-demo-wrap">
             <div class="prev-demo-mean" style="left:66.7%">
-              <div class="prev-demo-mean-label">M=3.0</div>
+              <div class="prev-demo-mean-label">Mdn=3.0</div>
               <div class="prev-demo-mean-arrow">▼</div>
             </div>
             <div class="prev-demo-track">
               <div class="prev-demo-dotline"></div>
-              <div class="prev-demo-sd" style="left:26.7%;width:73.3%" data-tooltip="SD=1.20 (CVR=.64)"></div>
+              <div class="prev-demo-sd" style="left:33.3%;width:50.0%" data-tooltip="Q1=2.00, Q3=3.50 (IQR=1.50, CVR=.64)"></div>
               <div class="prev-demo-circle" style="left:100%">4</div>
             </div>
           </div>
@@ -584,12 +584,12 @@
 
       <div class="ui-box">
         <div class="ui-row">
-          <span class="ui-label ui-label-blue">M=값</span>
-          <span class="ui-desc">3차 설문의 <strong>평균(Mean)</strong>을 나타냅니다. 가로선 위에서 평균 위치에 M=값과 ▼ 화살표가 표시됩니다.</span>
+          <span class="ui-label ui-label-blue">Mdn=값</span>
+          <span class="ui-desc">3차 설문의 <strong>중앙값(Median)</strong>을 나타냅니다. 가로선 위에서 중앙값 위치에 Mdn=값과 ▼ 화살표가 표시됩니다.</span>
         </div>
         <div class="ui-row">
           <span class="ui-label ui-label-green">초록 바</span>
-          <span class="ui-desc">3차 설문의 <strong>표준편차(SD) 범위</strong>를 나타냅니다. 평균을 중심으로 SD만큼 양쪽으로 표시됩니다. 마우스를 올리면 <strong>SD값과 CVR값</strong>이 말풍선으로 표시됩니다.</span>
+          <span class="ui-desc">3차 설문의 <strong>사분위범위(IQR), 즉 Q1~Q3 범위</strong>를 나타냅니다. 실제 Q1(제1사분위수)에서 Q3(제3사분위수)까지 표시됩니다. 마우스를 올리면 <strong>Q1, Q3, IQR값과 CVR값</strong>이 말풍선으로 표시됩니다.</span>
         </div>
         <div class="ui-row">
           <span class="ui-label ui-label-gray">회색 원</span>

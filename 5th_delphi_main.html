@@ -36,6 +36,8 @@
     .btn-save:disabled{opacity:.5;cursor:default}
     .btn-end{background:#e8e8e8;color:var(--ink);border:1.5px solid var(--divider) !important}
     .btn-end:hover{background:#d5d5d5}
+    .btn-guide{background:#fff;color:var(--accent);border:1.5px solid var(--accent);font-weight:600}
+    .btn-guide:hover{background:var(--accent);color:#fff}
 
     /* ── 메인 ── */
     .main-area{width:100%;max-width:1246px;display:flex;align-items:center;gap:0}
@@ -58,7 +60,7 @@
     .card-header{display:flex;align-items:center;padding:9px 22px;background:var(--accent-lt);border-bottom:1px solid var(--divider);gap:12px;flex-wrap:wrap}
     .card-header-title{font-size:17px;font-weight:600;color:var(--ink);white-space:nowrap;flex-shrink:0}
     .card-header-element{font-size:15px;font-weight:600;color:var(--accent);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .card-header-col-labels{margin-left:auto;display:flex;gap:12px;flex-shrink:0;align-items:center}
+    .card-header-col-labels{margin-left:auto;display:flex;gap:20px;flex-shrink:0;align-items:center}
     .col-label-header{font-size:13px;font-weight:700;color:#666;letter-spacing:.02em;text-align:center;white-space:nowrap}
     .col-label-header:first-child{width:186px}
     .col-label-header:last-child{width:186px}
@@ -72,7 +74,7 @@
     .card-body{padding:20px 22px}
 
     /* ── 지표 평정 항목 ── */
-    .index-item{padding:8px 0;border-bottom:1px solid #eee;display:flex;align-items:stretch;gap:20px;flex-wrap:wrap}
+    .index-item{padding:24px 0 8px;border-bottom:1px solid #eee;display:flex;align-items:stretch;gap:20px;flex-wrap:wrap}
     .index-item:first-child{padding-top:2px}
     .index-item:last-child{border-bottom:none;padding-bottom:2px}
     .index-left{flex:1;min-width:0}
@@ -115,7 +117,7 @@
     .reason-row.show{display:flex}
     .reason-row{align-items:flex-start;gap:8px}
     .reason-label{font-size:12px;color:var(--ink-soft);font-weight:500;white-space:nowrap;padding-top:7px;min-width:32px}
-    .reason-input{flex:1;border:1px solid var(--divider);border-radius:4px;padding:7px 12px;font-size:13px;font-family:inherit;line-height:1.5;outline:none;transition:border-color .2s;resize:vertical;min-height:36px}
+    .reason-input{flex:1;border:1px solid var(--divider);border-radius:4px;padding:7px 12px;font-size:13px;font-family:inherit;line-height:1.5;outline:none;transition:border-color .2s;resize:none;min-height:36px;overflow:hidden}
     .reason-input:focus{border-color:var(--accent)}
     .reason-input::placeholder{color:#b8bcc6}
 
@@ -162,6 +164,7 @@
     /* ── 모달 공통 ── */
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:1000;align-items:center;justify-content:center}
     .modal-overlay.active{display:flex}
+    #opinionModal.active{align-items:flex-start;padding-top:18vh}
     .modal-box{background:#fff;border-radius:6px;padding:32px 36px 28px;width:773px;max-width:94vw;box-shadow:0 8px 32px rgba(0,0,0,.18)}
     .modal-box h3{font-size:16px;color:var(--ink);margin-bottom:20px;font-weight:600}
     .modal-actions{display:flex;gap:10px;margin-top:20px}
@@ -171,6 +174,13 @@
     .modal-confirm{background:var(--accent);border:none;color:#fff}
     .end-modal-box{text-align:center}
     .end-modal-box p{font-size:15px;color:#333;line-height:1.7;margin-bottom:24px}
+    .guide-modal-box{width:960px;max-width:96vw;height:90vh;max-height:95vh;display:flex;flex-direction:column;overflow:hidden;padding:0;border-radius:8px}
+    .guide-modal-header{display:flex;align-items:center;padding:14px 22px;background:var(--accent-lt);border-bottom:1px solid var(--divider);cursor:grab;user-select:none;gap:12px}
+    .guide-modal-header:active{cursor:grabbing}
+    .guide-modal-title{font-size:16px;font-weight:600;color:var(--ink);flex:1}
+    .guide-modal-close{padding:5px 16px;font-size:13px;font-weight:500;color:var(--ink-soft);background:#fff;border:1px solid var(--divider);border-radius:4px;cursor:pointer;transition:background .15s}
+    .guide-modal-close:hover{background:#eee}
+    .guide-iframe{flex:1;width:100%;border:none;min-height:400px}
 
     /* ── 완료 페이지 ── */
     .completion-page{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;text-align:center;padding:60px 40px}
@@ -182,17 +192,18 @@
 
 
     /* ── 2차 결과 표시 ── */
-    .prev-bar-area{position:relative;flex-shrink:0;width:186px;padding:22px 2px 22px;display:flex;flex-direction:column;justify-content:center}
-    .prev-mean-group{position:absolute;top:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;white-space:nowrap;z-index:3}
+    .prev-bar-area{position:relative;flex-shrink:0;width:186px;padding:0 0 13px;display:flex;flex-direction:column;justify-content:flex-end;overflow:visible}
+    .prev-mean-group{position:absolute;top:0;left:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;white-space:nowrap;z-index:3}
     .prev-mean-label{font-size:10.5px;font-weight:700;color:#4a6fa5;line-height:1.2}
     .prev-arrow-head{color:#4a6fa5;font-size:9px;line-height:1}
-    .prev-bar-track{position:relative;height:8px;margin:0}
-    .prev-bar-dotline{position:absolute;top:50%;left:0;right:0;border-top:2px dotted #c0c5d0;transform:translateY(-50%)}
-    .prev-bar-sd{position:absolute;top:0;height:100%;background:#5a9a6e;border-radius:4px;z-index:1;cursor:pointer}
-    .prev-bar-sd::after{content:attr(data-tooltip);position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#fff;color:#555;font-size:12px;font-weight:500;padding:4px 9px;border-radius:5px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:10;box-shadow:0 1px 6px rgba(0,0,0,.15);border:1px solid #e0e0e0}
-    .prev-bar-sd::before{content:'';position:absolute;top:calc(100% + 2px);left:50%;transform:translateX(-50%);border:4px solid transparent;border-bottom-color:#e0e0e0;opacity:0;pointer-events:none;transition:opacity .15s;z-index:10}
+    .prev-bar-track{position:relative;height:46px;margin:0;overflow:visible}
+    .prev-bar-dotline{position:absolute;bottom:13px;left:0;right:0;border-top:1.5px dotted #c8cdd6}
+    .prev-scale-num{position:absolute;bottom:8px;transform:translateX(-50%);font-size:10px;font-weight:700;color:#999;line-height:1;background:#fff;padding:0 2px;z-index:1}
+    .prev-bar-sd{position:absolute;bottom:9px;height:8px;background:#5a9a6e;border-radius:4px;z-index:2;cursor:pointer}
+    .prev-bar-sd::after{content:attr(data-tooltip);position:absolute;top:calc(100% + 18px);left:50%;transform:translateX(-50%);background:#fff;color:#555;font-size:12px;font-weight:500;padding:4px 9px;border-radius:5px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:10;box-shadow:0 1px 6px rgba(0,0,0,.15);border:1px solid #e0e0e0}
+    .prev-bar-sd::before{content:'';position:absolute;top:calc(100% + 14px);left:50%;transform:translateX(-50%);border:4px solid transparent;border-bottom-color:#e0e0e0;opacity:0;pointer-events:none;transition:opacity .15s;z-index:10}
     .prev-bar-sd:hover::after,.prev-bar-sd:hover::before{opacity:1}
-    .prev-circle{position:absolute;top:50%;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;background:#9e9e9e;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.15);z-index:2;cursor:pointer}
+    .prev-circle{position:absolute;bottom:2px;transform:translateX(-50%);width:22px;height:22px;border-radius:50%;background:#9e9e9e;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.15);z-index:3;cursor:pointer}
     .prev-circle::after{content:'이전 선택';position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#fff;color:#555;font-size:12px;font-weight:500;padding:4px 9px;border-radius:5px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:10;box-shadow:0 1px 6px rgba(0,0,0,.15);border:1px solid #e0e0e0}
     .prev-circle::before{content:'';position:absolute;top:calc(100% + 2px);left:50%;transform:translateX(-50%);border:4px solid transparent;border-bottom-color:#e0e0e0;opacity:0;pointer-events:none;transition:opacity .15s;z-index:10}
     .prev-circle:hover::after,.prev-circle:hover::before{opacity:1}
@@ -200,7 +211,7 @@
     .prev-circle.no-data::after{content:'이전 선택 없음'}
     .ops-view-btn{display:inline-block;margin-left:6px;padding:2px 8px;font-size:11.5px;font-family:inherit;background:#fffbf0;border:1px solid #c0a060;border-radius:4px;color:#8a6d30;cursor:pointer;font-weight:600;vertical-align:middle;line-height:1.4;transition:background .15s}
     .ops-view-btn:hover{background:#fff3d8}
-    .prev-bar-col{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+    .prev-bar-col{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;margin-right:12px}
     .index-right{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 0 13px}
     .col-label{font-size:10px;font-weight:600;color:#888;letter-spacing:.03em;text-align:center;margin-bottom:2px;white-space:nowrap}
 
@@ -305,6 +316,17 @@
     </div>
   </div>
 
+  <!-- 설문 방법 확인 모달 -->
+  <div class="modal-overlay" id="guideModal">
+    <div class="modal-box guide-modal-box" id="guideModalBox">
+      <div class="guide-modal-header" id="guideModalHeader">
+        <span class="guide-modal-title">설문 방법 확인</span>
+        <button class="guide-modal-close" id="guideModalClose">닫기</button>
+      </div>
+      <iframe class="guide-iframe" id="guideIframe" src="about:blank"></iframe>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <!-- 의견 조회 모달 -->
@@ -330,6 +352,7 @@
         <span class="font-scale-label" id="fontScaleLabel">100%</span>
         <button class="btn-font btn-font-up" id="btnFontUp" title="글자 확대"><span class="btn-font-letter">A</span><span class="btn-font-icon">+</span></button>
       </div>
+      <button class="btn-hdr btn-guide" id="btnGuide">설문 방법 확인</button>
       <button class="btn-hdr btn-save" id="btnSave">저장</button>
       <button class="btn-hdr btn-end" id="btnEnd">나가기</button>
     </div>
@@ -554,11 +577,10 @@
   }
 
   async function loadData() {
-    showLoading(true);
     try {
       /* sessionStorage 캐시 확인 (5분 유효) */
-      const cacheKey = '5th_delphi_cache_v1_' + panelEmail;
-      const cacheTimeKey = '5th_delphi_cache_time_v1_' + panelEmail;
+      const cacheKey = '5th_delphi_cache_v2_' + panelEmail;
+      const cacheTimeKey = '5th_delphi_cache_time_v2_' + panelEmail;
       const cached = sessionStorage.getItem(cacheKey);
       const cachedTime = parseInt(sessionStorage.getItem(cacheTimeKey) || '0', 10);
       const CACHE_TTL = 5 * 60 * 1000;
@@ -575,6 +597,7 @@
         savedRatingsData = c.savedRatingsData;
         console.log('[loadData] 캐시에서 로드');
       } else {
+        showLoading(true); /* 캐시 미스일 때만 로딩 표시 */
         /* ── 3개 동시 호출 ── */
         // 1) 패널 조회 (BASIC_GAS) — 미리보기 시 GAS 호출 생략
         let panelP;
@@ -810,18 +833,20 @@
       let opsHtml = '';     // 의견 버튼 (지표 아래 전체폭)
 
       // ── 2차 결과 표시 ──
-      if (res2 && res2.mean !== null) {
-        const m = res2.mean, s = res2.sd || 0, c = res2.cvr;
-        const mDisp = m !== null ? m.toFixed(2) : '-';
-        const sDisp = s !== null ? (s < 1 && s > -1 ? s.toFixed(2).replace('0.', '.').replace('-0.','-.'): s.toFixed(2)) : '-';
-        const cDisp = c !== null ? (c < 1 && c > -1 ? c.toFixed(2).replace('0.', '.').replace('-0.','-.'): c.toFixed(2)) : '-';
+      if (res2 && res2.median !== null && res2.median !== undefined) {
+        const m = parseFloat(res2.median), s = parseFloat(res2.IQR) || 0, c = res2.cvr != null ? parseFloat(res2.cvr) : null;
+        const mDisp = !isNaN(m) ? m.toFixed(2) : '-';
+        const sDisp = !isNaN(s) ? (s < 1 && s > -1 ? s.toFixed(2).replace('0.', '.').replace('-0.','-.'): s.toFixed(2)) : '-';
+        const cDisp = c !== null && !isNaN(c) ? (c < 1 && c > -1 ? c.toFixed(2).replace('0.', '.').replace('-0.','-.'): c.toFixed(2)) : '-';
 
-        // 평균 위치 (1~5 → 0~100%)
+        // 중앙값 위치 (1~5 → 0~100%)
         const meanPos = ((m - 1) / 4 * 100);
 
-        // SD 바 계산: M ± SD (1~5 스케일)
-        const sdL = Math.max(0, ((m - s) - 1) / 4 * 100);
-        const sdR = Math.min(100, ((m + s) - 1) / 4 * 100);
+        // IQR 바 계산: Q1~Q3 실제 범위 (1~5 스케일)
+        const q1 = parseFloat(res2.Q1), q3 = parseFloat(res2.Q3);
+        const hasQ = !isNaN(q1) && !isNaN(q3);
+        const sdL = hasQ ? Math.max(0, ((q1 - 1) / 4 * 100)) : Math.max(0, ((m - s/2) - 1) / 4 * 100);
+        const sdR = hasQ ? Math.min(100, ((q3 - 1) / 4 * 100)) : Math.min(100, ((m + s/2) - 1) / 4 * 100);
         const sdW = Math.max(0, sdR - sdL);
 
         // 패널의 2차 평정
@@ -829,23 +854,27 @@
         const circlePos = prevRating > 0 ? ((prevRating - 1) / 4 * 100) : -1;
 
         // 바 영역 HTML: M= 평균 위치에 배치
-        const sdTooltip = `SD=${sDisp} (CVR=${cDisp})`;
+        const q1Disp = hasQ ? q1.toFixed(2) : '-', q3Disp = hasQ ? q3.toFixed(2) : '-';
+        const sdTooltip = `Q1=${q1Disp}, Q3=${q3Disp} (IQR=${sDisp}, CVR=${cDisp})`;
         const arrowOverlap = prevRating > 0 && Math.abs(meanPos - circlePos) < 10;
 
         res2Html += `<div class="prev-bar-area">`;
-        res2Html += `  <div class="prev-mean-group" style="left:${meanPos}%">`;
-        res2Html += `    <div class="prev-mean-label">M=${mDisp}</div>`;
+        res2Html += `  <div class="prev-bar-track">`;
+        res2Html += `    <div class="prev-mean-group" style="left:${meanPos}%">`;
+        res2Html += `      <div class="prev-mean-label">Mdn=${mDisp}</div>`;
         if (!arrowOverlap) {
-          res2Html += `    <div class="prev-arrow-head">▼</div>`;
+          res2Html += `      <div class="prev-arrow-head">▼</div>`;
         }
-        res2Html += `  </div>`;
-        res2Html += `  <div class="prev-bar-track"><div class="prev-bar-dotline"></div>`;
+        res2Html += `    </div>`;
+        res2Html += `    <div class="prev-bar-dotline"></div>`;
         res2Html += `    <div class="prev-bar-sd" style="left:${sdL}%;width:${sdW}%" data-tooltip="${sdTooltip}"></div>`;
         if (prevRating > 0) {
           res2Html += `    <div class="prev-circle" style="left:${circlePos}%">${prevRating}</div>`;
         } else {
           res2Html += `    <div class="prev-circle no-data" style="left:50%">-</div>`;
         }
+        res2Html += `    <div class="prev-bar-dotline"></div>`;
+        res2Html += `    <span class="prev-scale-num" style="left:0%">1</span><span class="prev-scale-num" style="left:25%">2</span><span class="prev-scale-num" style="left:50%">3</span><span class="prev-scale-num" style="left:75%">4</span><span class="prev-scale-num" style="left:100%">5</span>`;
         res2Html += `  </div>`;
         res2Html += `</div>`;
 
@@ -853,7 +882,11 @@
       } else {
         // 2차 결과 없음 → 점선만 표시
         res2Html += `<div class="prev-bar-area">`;
-        res2Html += `  <div class="prev-bar-track"><div class="prev-bar-dotline"></div></div>`;
+        res2Html += `  <div class="prev-bar-track">`;
+        res2Html += `    <div class="prev-bar-dotline"></div>`;
+        res2Html += `    <div class="prev-bar-dotline"></div>`;
+        res2Html += `    <span class="prev-scale-num" style="left:0%">1</span><span class="prev-scale-num" style="left:25%">2</span><span class="prev-scale-num" style="left:50%">3</span><span class="prev-scale-num" style="left:75%">4</span><span class="prev-scale-num" style="left:100%">5</span>`;
+        res2Html += `  </div>`;
         res2Html += `</div>`;
       }
 
@@ -915,12 +948,19 @@
     });
 
     // 이벤트 바인딩: 사유 입력
+    function autoResizeTextarea(ta) {
+      ta.style.height = 'auto';
+      ta.style.height = ta.scrollHeight + 'px';
+    }
     body.querySelectorAll('.reason-input').forEach(ta => {
       ta.addEventListener('input', () => {
         const k = ta.dataset.key;
         if (!responses[k]) responses[k] = {};
         responses[k].reason = ta.value;
+        autoResizeTextarea(ta);
       });
+      // 초기 로드 시 내용에 맞게 높이 조절
+      if (ta.value) autoResizeTextarea(ta);
     });
   }
 
@@ -1426,6 +1466,51 @@
   });
   document.getElementById('opinionModal').addEventListener('click', e => {
     if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
+  });
+
+  /* ── 모달 드래그 ── */
+  function setupModalDrag(overlay, box, handle) {
+    let dragging = false, didDrag = false, ox = 0, oy = 0;
+    function onDown(cx, cy, evt) {
+      dragging = true; didDrag = false;
+      const r = box.getBoundingClientRect();
+      ox = cx - r.left; oy = cy - r.top;
+      box.style.position = 'fixed';
+      box.style.margin = '0';
+      box.style.left = r.left + 'px';
+      box.style.top = r.top + 'px';
+      box.style.transform = 'none';
+      if (evt && evt.preventDefault) evt.preventDefault();
+    }
+    function onMove(cx, cy) { if (!dragging) return; didDrag = true; box.style.left = (cx - ox) + 'px'; box.style.top = (cy - oy) + 'px'; }
+    function onUp() { dragging = false; }
+    handle.addEventListener('mousedown', e => { if (e.target.closest('button') || e.target.closest('.desc-modal-right')) return; onDown(e.clientX, e.clientY, e); });
+    document.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
+    document.addEventListener('mouseup', onUp);
+    handle.addEventListener('touchstart', e => { if (e.target.closest('button') || e.target.closest('.desc-modal-right')) return; const t = e.touches[0]; onDown(t.clientX, t.clientY); }, { passive: true });
+    document.addEventListener('touchmove', e => { if (!dragging) return; const t = e.touches[0]; onMove(t.clientX, t.clientY); }, { passive: true });
+    document.addEventListener('touchend', onUp);
+    if (overlay) {
+      overlay.addEventListener('click', e => { if (e.target === overlay && !didDrag) overlay.classList.remove('active'); });
+    }
+    function resetPos() { box.style.position = ''; box.style.margin = ''; box.style.left = ''; box.style.top = ''; box.style.transform = ''; }
+    return resetPos;
+  }
+
+  /* ── 설문 방법 확인 모달 ── */
+  const guideModal = document.getElementById('guideModal');
+  const guideModalBox = document.getElementById('guideModalBox');
+  const guideIframe = document.getElementById('guideIframe');
+  const resetGuideModalPos = setupModalDrag(guideModal, guideModalBox, document.getElementById('guideModalHeader'));
+  document.getElementById('btnGuide').addEventListener('click', () => {
+    guideIframe.src = '5th_delphi_guide.html?embed=1';
+    resetGuideModalPos();
+    guideModal.classList.add('active');
+  });
+  document.getElementById('guideModalClose').addEventListener('click', () => {
+    resetGuideModalPos();
+    guideModal.classList.remove('active');
+    guideIframe.src = 'about:blank';
   });
 
   loadData();

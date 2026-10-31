@@ -113,7 +113,7 @@
     .reason-row.show{display:flex}
     .reason-row{align-items:flex-start;gap:8px}
     .reason-label{font-size:12px;color:var(--ink-soft);font-weight:500;white-space:nowrap;padding-top:7px;min-width:32px}
-    .reason-input{flex:1;border:1px solid var(--divider);border-radius:4px;padding:7px 12px;font-size:13px;font-family:inherit;line-height:1.5;outline:none;transition:border-color .2s;resize:vertical;min-height:36px}
+    .reason-input{flex:1;border:1px solid var(--divider);border-radius:4px;padding:7px 12px;font-size:13px;font-family:inherit;line-height:1.5;outline:none;transition:border-color .2s;resize:none;overflow:hidden;min-height:36px}
     .reason-input:focus{border-color:var(--accent)}
     .reason-input::placeholder{color:#b8bcc6}
 
@@ -600,7 +600,6 @@
   }
 
   async function loadData() {
-    showLoading(true);
     try {
       /* (#1) 캐시 키 갱신 — 기존 캐시와 충돌 방지 */
       const cacheKey = '2nd_delphi_cache_v2_' + panelEmail;
@@ -612,6 +611,7 @@
       let panelCol = '';
       let panelIdx = 0;
       let surveyData, savedRatingsData;
+      let isCacheHit = false;
 
       if (cached && (Date.now() - cachedTime < CACHE_TTL)) {
         /* ── 캐시 히트: 새 포맷(E-ID) 여부 검증 후 사용 ── */
@@ -625,6 +625,7 @@
           surveyData = c.surveyData;
           savedRatingsData = c.savedRatingsData;
           console.log('[loadData] 캐시에서 로드 (새 포맷)');
+          isCacheHit = true;
         } else {
           // 기존 포맷 캐시 → 무효화하고 서버에서 다시 로드
           console.log('[loadData] 캐시가 기존 포맷 → 무효화');
@@ -635,6 +636,7 @@
       }
 
       if (!surveyData) {
+        showLoading(true); /* 캐시 미스일 때만 로딩 표시 */
         /* ── 서버에서 로드 (캐시 미스 또는 기존 포맷 무효화) ── */
         // (#1) 재시도 로직 포함
         const MAX_RETRIES = 2;
@@ -706,21 +708,18 @@
       hahwaIndices  = groupByIdFromGAS(surveyData.hahwaRows || []);
       sangguIndices = groupByIdFromGAS(surveyData.sangguRows || []);
 
-      // 1차 추가 의견 데이터 로드 (추가 사유 확인용)
-      try {
-        const addRes = await gasCall({ action:'get1stAddData' });
-        if (addRes.status === 'ok' && addRes.rows) {
-          addReasonData = addRes.rows;
-          console.log('[init] 1차 추가 의견:', addReasonData.length, '건');
-        }
-      } catch(ae) { console.warn('[init] 추가 의견 로드 실패:', ae); }
+      // 1차 추가 의견 데이터 로드 (캐시 히트 시 렌더 후 비동기)
+      if (!isCacheHit) {
+        try {
+          const addRes = await gasCall({ action:'get1stAddData' });
+          if (addRes.status === 'ok' && addRes.rows) {
+            addReasonData = addRes.rows;
+            console.log('[init] 1차 추가 의견:', addReasonData.length, '건');
+          }
+        } catch(ae) { console.warn('[init] 추가 의견 로드 실패:', ae); }
+      }
 
       console.log('[init] id:', idRows.length, 'edu:', (surveyData.eduRows||[]).length, 'hahwa:', (surveyData.hahwaRows||[]).length, 'sanggu:', (surveyData.sangguRows||[]).length);
-      console.log('[init] eduIndices keys:', Object.keys(eduIndices));
-      console.log('[init] hahwaIndices keys:', Object.keys(hahwaIndices));
-      console.log('[init] sangguIndices keys:', Object.keys(sangguIndices));
-      if (idRows.length > 0) console.log('[init] first idRow:', JSON.stringify(idRows[0]));
-      if ((surveyData.eduRows||[]).length > 0) console.log('[init] first eduRow:', JSON.stringify(surveyData.eduRows[0]));
 
       /* 기존 응답 복원 */
       if (savedRatingsData && savedRatingsData.savedRatings) {
@@ -731,10 +730,20 @@
         retryMsg.textContent = '설문 데이터가 없습니다. 시트를 확인해주세요.';
         retryModal.classList.add('active');
       } else {
-        /* (#4) 완료 상태 확인 — 재제출 여부 판별 */
-        await checkPanelCompletionStatus();
+        if (!isCacheHit) {
+          /* 캐시 미스: 기존 흐름 — 완료 확인 후 렌더 */
+          await checkPanelCompletionStatus();
+        }
         renderPage();
         showSurveyUI(true);
+
+        if (isCacheHit) {
+          /* 캐시 히트: 렌더 후 비동기로 완료 상태 확인 + 추가 의견 로드 */
+          checkPanelCompletionStatus().catch(e => console.warn('[cache] completion check:', e));
+          gasCall({ action:'get1stAddData' }).then(r => {
+            if (r.status === 'ok' && r.rows) { addReasonData = r.rows; console.log('[cache] 1차 추가 의견:', r.rows.length, '건'); }
+          }).catch(e => console.warn('[cache] 추가 의견:', e));
+        }
       }
     } catch(e) {
       console.error('[loadData 에러]', e);
@@ -827,6 +836,12 @@
       map[eId].push(row);
     });
     return map;
+  }
+
+  /* ════════════════════ textarea 자동 높이 ════════════════════ */
+  function autoResizeTextarea(ta) {
+    ta.style.height = 'auto';
+    ta.style.height = ta.scrollHeight + 'px';
   }
 
   /* ════════════════════ 페이지 렌더링 ════════════════════ */
@@ -993,7 +1008,9 @@
 
     // 이벤트 바인딩: 사유 입력
     body.querySelectorAll('.reason-input').forEach(ta => {
+      autoResizeTextarea(ta);
       ta.addEventListener('input', () => {
+        autoResizeTextarea(ta);
         const k = ta.dataset.key;
         if (!responses[k]) responses[k] = {};
         responses[k].reason = ta.value;
